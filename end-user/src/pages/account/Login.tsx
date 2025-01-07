@@ -2,7 +2,6 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { motion, useAnimate } from 'motion/react';
 
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -12,9 +11,10 @@ import github from '@/assets/githubLogo.svg';
 import { Link } from 'react-router';
 
 const formSchema = z.object({
-    email: z.string({ message: 'Email is required.' }).email({ message: 'Invalid email address' }),
+    email: z.string().min(1, { message: 'Email is required.' }).email({ message: 'Invalid email address' }),
     password: z
-        .string({ message: 'Password is required.' })
+        .string()
+        .min(1, { message: 'Password is required.' })
         .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/, {
             message:
                 'Invalid password. Please make sure your password is at least 8 characters long and contains an uppercase letter, a lowercase letter, a number, and a special character.',
@@ -22,7 +22,6 @@ const formSchema = z.object({
 });
 
 function Login() {
-    const [scope, animate] = useAnimate();
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -39,7 +38,7 @@ function Login() {
     }
 
     return (
-        <div className="flex justify-center items-center h-svh">
+        <div className="flex-center min-h-svh">
             <div className="flex-center flex-col w-[400px] p-10 gap-5 shadow-lg rounded-lg border-2">
                 <img src="/vite.svg" />
                 <h1 className="text-lg font-semibold">Login to your Account</h1>
