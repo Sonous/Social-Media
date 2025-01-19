@@ -1,4 +1,3 @@
-import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -94,7 +93,7 @@ function Login() {
                         />
 
                         <FormDescription>
-                            <Link to={'/account/reset'} className="text-picton_blue-100">
+                            <Link to={'/reset'} className="text-picton_blue-100">
                                 Forgot password?
                             </Link>
                         </FormDescription>
@@ -106,7 +105,7 @@ function Login() {
                         <FormDescription>
                             <p className="text-sm">
                                 Don't have an account?{' '}
-                                <Link to={'/account/signup'} className="font-semibold text-picton_blue cursor-pointer">
+                                <Link to={'/signup'} className="font-semibold text-picton_blue cursor-pointer">
                                     Sign up
                                 </Link>
                             </p>

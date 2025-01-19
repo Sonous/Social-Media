@@ -1,0 +1,6 @@
+{
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode", // ID của Prettier
+    "prettier.endOfLine": "lf", // Tuỳ chỉnh end of line (nếu cần)
+    "prettier.singleQuote": true // Ví dụ cấu hình Prettier
+}

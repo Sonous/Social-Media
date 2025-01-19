@@ -32,7 +32,7 @@ function Reset() {
                     <div className="h-[1px] w-full bg-[#dbdbdb]"></div>
                 </div>
 
-                <Link to="/account/signup" className="text-sm hover:text-blue_(ncs)">
+                <Link to="/signup" className="text-sm hover:text-blue_(ncs)">
                     Create new account
                 </Link>
             </div>
