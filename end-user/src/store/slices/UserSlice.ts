@@ -1,20 +1,17 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../store';
 
-interface User {
-    id: string;
-    firstName: string;
-    lastName: string;
-    age: number;
-    email: string;
-}
+
 
 const initialState: User = {
     id: '',
-    firstName: '',
-    lastName: '',
-    age: 0,
+    name: '',
+    username: '',
     email: '',
+    avatar_url: '',
+    bio: '',
+    // created_at: '',
+    // updated_at: '',
 };
 
 export const userSlice = createSlice({

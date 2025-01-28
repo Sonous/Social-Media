@@ -1,11 +1,19 @@
 import { MailerService } from '@nestjs-modules/mailer';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { totp } from 'otplib';
 import * as bcrypt from 'bcrypt';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Users } from 'src/entities/user.entity';
+import { Repository } from 'typeorm';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-    constructor(private readonly mailService: MailerService) {
+    constructor(
+        private readonly mailService: MailerService,
+        @InjectRepository(Users) private usersRepository: Repository<Users>,
+        private jwtService: JwtService,
+    ) {
         totp.options = {
             step: 60,
             digits: 6,
@@ -38,5 +46,60 @@ export class AuthService {
 
     async comparePassword(password: string, hashedPassword: string): Promise<boolean> {
         return await bcrypt.compare(password, hashedPassword);
+    }
+
+    async login(email: string, password: string): Promise<{ access_token: string }> {
+        const user = await this.usersRepository
+            .createQueryBuilder('user')
+            .where('user.email = :email', { email })
+            .getOne();
+
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+
+        const isMatch = await this.comparePassword(password, user.password);
+
+        if (!isMatch) {
+            throw new UnauthorizedException('Incorrect password');
+        }
+
+        const payload = { id: user.id, email: user.email };
+
+        return {
+            access_token: await this.jwtService.signAsync(payload, {
+                expiresIn: '2h',
+            }),
+        };
+    }
+
+    async signUp(email: string) {
+        const user = await this.usersRepository
+            .createQueryBuilder('user')
+            .where('user.email = :email', { email })
+            .getOne();
+
+        if (user) {
+            throw new UnauthorizedException('Email already exists');
+        }
+
+        await this.sendOtp(email);
+    }
+
+    async resetPassword(email: string) {
+        const user: Users = await this.usersRepository
+            .createQueryBuilder('user')
+            .where('user.email = :email', { email })
+            .getOne();
+
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+
+        await this.sendOtp(email);
+
+        return {
+            userId: user.id,
+        };
     }
 }

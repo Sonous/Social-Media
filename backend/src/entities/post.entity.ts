@@ -1,6 +1,7 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Time } from './time.entity';
 import { Users } from './user.entity';
+import { Hashtags } from './hashtags.entity';
 
 @Entity()
 export class Posts extends Time {
@@ -18,6 +19,23 @@ export class Posts extends Time {
     })
     medias: string[];
 
+    @Column()
+    userId: string;
+
     @ManyToOne(() => Users, (user) => user.posts)
     user: Users;
+
+    @ManyToMany(() => Hashtags, (hashtags) => hashtags.posts)
+    @JoinTable({
+        name: 'posts_hashtags',
+        joinColumn: {
+            name: 'post_id',
+            referencedColumnName: 'id',
+        },
+        inverseJoinColumn: {
+            name: 'hashtag_id',
+            referencedColumnName: 'id',
+        },
+    })
+    hashtags: Hashtags[];
 }

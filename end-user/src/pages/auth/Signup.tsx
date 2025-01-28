@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import classNames from 'classnames';
 
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -32,6 +32,7 @@ function Signup() {
     const [disabledInputs, setDisabledInputs] = useState(['otp', 'info']);
     const [isMounted, setIsMounted] = useState(false);
     const [showTimer, setShowTimer] = useState(false);
+    const navigate = useNavigate()
     const { toast } = useToast()
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -44,13 +45,28 @@ function Signup() {
         },
     });
 
-    function onSubmit(values: z.infer<typeof formSchema>) {
-        // Do something with the form values.
-        // ✅ This will be type-safe and validated.
-        console.log('jdsfijsdi');
-        console.log(values);
+    // Sign up
+    async function handleSignup(values: z.infer<typeof formSchema>) {
+        try {
+            // TODO: Add loading effect
+            const newUser = {
+                name: values.fullname,
+                username: values.username,
+                email: values.email,
+                password: values.password,
+                avatar_url: '',
+                bio: ''
+            }
+
+            await userApis.addUser(newUser)
+
+            navigate('/login')
+        } catch (error) {
+            console.log('Signup error', error)
+        }
     }
 
+    // Send otp email
     async function handleSendOTP() {
         try {
             const isValid = await form.trigger('email');
@@ -58,18 +74,23 @@ function Signup() {
             if (isValid) {
                 // TODO: Add loading effect
                 await authApis.sendOpt(form.getValues('email'));
-                console.log('send otp success');
                 setDisabledInputs((prev) => [...prev.filter((item) => item !== 'otp'), 'email']);
                 setShowTimer(true)
             }
         } catch (error) {
-            console.log(error);
+            if(error.status === 401) {
+                form.setError('email', {
+                    type: 'custom',
+                    message: 'Email have been used. Please use another one.',
+                })
+                return;
+            }
+            console.log('Send otp error', error);
         }
     }
 
     // Check otp
     const otpDebounce = useDebounce(form.watch('otp'), 500);
-
 
     useEffect(() => {
         if (isMounted) {
@@ -88,7 +109,7 @@ function Signup() {
                 const { data } = await authApis.checkOtp(otpDebounce);
 
                 if (data.isValid) {
-                    setDisabledInputs(['otp'])
+                    setDisabledInputs(prev => [...prev.filter(item => item !== 'info'), 'otp', 'getOtp'])
                     toast({
                         title: 'Success',
                         description: 'OTP is valid',
@@ -131,12 +152,17 @@ function Signup() {
                     })
                 } else {
                     //TODO: process sign up action
+                    toast({
+                        title: 'Success',
+                        description: 'Username is valid',
+                    })
                 }
             } catch (error) {
                 console.log(error)
             }
         }
     }, [usernameDebouce])
+
 
     return (
         <div className="flex-center min-h-svh">
@@ -148,9 +174,6 @@ function Signup() {
 
                 <Form {...form}>
                     <form
-                        onSubmit={form.handleSubmit(onSubmit, (inValid) => {
-                            console.log(inValid);
-                        })}
                         className="flex flex-col gap-5 w-full"
                     >
                         <div>
@@ -169,11 +192,11 @@ function Signup() {
                                         <FormDescription className="flex justify-end">
                                             <span
                                                 className={classNames(" font-medium", {
-                                                    "text-cerulean  cursor-pointer": !showTimer,
-                                                    "text-cerulean-200 cursor-not-allowed": showTimer
+                                                    "text-cerulean  cursor-pointer": !showTimer && !disabledInputs.includes('getOtp'),
+                                                    "text-cerulean-200 cursor-not-allowed": showTimer || disabledInputs.includes('getOtp'),
                                                 })}
                                                 onClick={() => {
-                                                    if(!showTimer) {
+                                                    if(!showTimer && !disabledInputs.includes('getOtp')) {
                                                         handleSendOTP()
                                                     }
                                                 }}
@@ -247,7 +270,18 @@ function Signup() {
                             />
                         </div>
 
-                        <Button type="submit" className="w-full bg-picton_blue hover:bg-blue_(ncs)">
+                        <Button type='button' className="w-full bg-picton_blue hover:bg-blue_(ncs)" onClick={async () => {
+                            const { invalid: usernameInvalid } = form.getFieldState('username')
+                            const { invalid: emailInvalid } = form.getFieldState('email')
+
+                            if(!usernameInvalid && !emailInvalid) {
+                                const isFormValid = await form.trigger()
+
+                                if(isFormValid) {
+                                    handleSignup(form.getValues())
+                                }
+                            } 
+                        }}>
                             Sign up
                         </Button>
 

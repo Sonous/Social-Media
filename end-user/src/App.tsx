@@ -4,7 +4,10 @@ import MainLayout from './layouts/MainLayout';
 import Login from './pages/auth/Login';
 import Signup from './pages/auth/Signup';
 import Reset from './pages/auth/Reset';
-import { ProtectedRoutes } from './utils/ProtectedRoutes';
+import { ProtectedRoutes } from './utils/AuthProtectedRoutes';
+import { UnauthorProtectRoute } from './utils/UnauthorProtectRoute';
+import { Inbox } from './pages/Inbox';
+import { Profile } from './pages/Profile';
 
 function App() {
     return (
@@ -13,12 +16,16 @@ function App() {
                 <Route element={<ProtectedRoutes />}>
                     <Route element={<MainLayout />}>
                         <Route index element={<Home />} />
+                        <Route path='/inbox' element={<Inbox />} />
+                        <Route path='/:username' element={<Profile />} />
                     </Route>
                 </Route>
 
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<Signup />} />
-                <Route path="/reset" element={<Reset />} />
+                <Route element={<UnauthorProtectRoute />}>
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/signup" element={<Signup />} />
+                    <Route path="/reset" element={<Reset />} />
+                </Route>
             </Routes>
         </BrowserRouter>
     );

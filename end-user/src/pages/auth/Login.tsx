@@ -5,9 +5,14 @@ import { z } from 'zod';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import google from '@/assets/googleLogo.png';
-import github from '@/assets/githubLogo.svg';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
+import authApis from '@/apis/auth';
+import { useAppDispatch } from '@/hooks/reduxHooks';
+import { setUser } from '@/store/slices/UserSlice';
+// import supabase from '@/utils/supabase';
+// import google from '@/assets/googleLogo.png';
+// import github from '@/assets/githubLogo.svg';
+// import useLocalStorage from '@/hooks/useLocalStorage';
 
 const formSchema = z.object({
     email: z.string().min(1, { message: 'Email is required.' }).email({ message: 'Invalid email address' }),
@@ -21,6 +26,8 @@ const formSchema = z.object({
 });
 
 function Login() {
+    const dispatch = useAppDispatch();
+    const navigate = useNavigate();
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -28,13 +35,42 @@ function Login() {
             password: '',
         },
     });
+    // const { setItem } = useLocalStorage('auth_info')
 
-    function onSubmit(values: z.infer<typeof formSchema>) {
-        // Do something with the form values.
-        // ✅ This will be type-safe and validated.
-        console.log('jdsfijsdi');
-        console.log(values);
+    async function onSubmit(values: z.infer<typeof formSchema>) {
+        try {
+            const userInfo = await authApis.login(values.email, values.password);
+
+            dispatch(setUser(userInfo));
+            navigate('/');
+        } catch (error) {
+            if(error.status === 401) {
+                form.setError('email', {
+                    type: 'manual',
+                    message: 'Invalid email or password',
+                });
+                form.setError('password', {
+                    type: 'manual',
+                    message: 'Invalid email or password',
+                });
+            }
+            console.log(error);
+        }
     }
+
+    // async function handleLoginWithGithub() {
+    //     const {  error } = await supabase.auth.signInWithOAuth({
+    //         provider: 'github',
+    //         options: {
+    //             redirectTo: `http://localhost:5173/login`,
+    //         },
+    //     });
+
+    //     if (!error) {
+    //         setItem('isLogged', true)
+    //         setItem('access_token', '')
+    //     }
+    // }
 
     return (
         <div className="flex-center min-h-svh">
@@ -42,14 +78,14 @@ function Login() {
                 <img src="/vite.svg" />
                 <h1 className="text-lg font-semibold">Login to your Account</h1>
 
-                <div className="flex flex-col gap-2 w-full">
+                {/* <div className="flex flex-col gap-2 w-full">
                     <Button variant={'outline'}>
                         <img src={google} className="h-6 w-6" /> Log in with Google
                     </Button>
-                    <Button variant={'outline'}>
+                    <Button variant={'outline'} onClick={handleLoginWithGithub}>
                         <img src={github} className="h-6 w-6" /> Log in with Github
                     </Button>
-                </div>
+                </div> */}
 
                 <div className="flex justify-center items-center w-full">
                     <div className="h-[1px] w-full bg-[#dbdbdb]"></div>
@@ -102,13 +138,11 @@ function Login() {
                             Log in
                         </Button>
 
-                        <FormDescription>
-                            <p className="text-sm">
-                                Don't have an account?{' '}
-                                <Link to={'/signup'} className="font-semibold text-picton_blue cursor-pointer">
-                                    Sign up
-                                </Link>
-                            </p>
+                        <FormDescription className="text-sm">
+                            Don't have an account?{' '}
+                            <Link to={'/signup'} className="font-semibold text-picton_blue cursor-pointer">
+                                Sign up
+                            </Link>
                         </FormDescription>
                     </form>
                 </Form>

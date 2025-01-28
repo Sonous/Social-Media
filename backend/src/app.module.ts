@@ -10,6 +10,8 @@ import { Time } from './entities/time.entity';
 import { PostsModule } from './posts/posts.module';
 import { Posts } from './entities/post.entity';
 import { APP_PIPE } from '@nestjs/core';
+import { HashtagsModule } from './hashtags/hashtags.module';
+import { Hashtags } from './entities/hashtags.entity';
 
 @Module({
     imports: [
@@ -21,12 +23,12 @@ import { APP_PIPE } from '@nestjs/core';
             username: process.env.DB_USERNAME,
             password: process.env.DB_PASSWORD,
             database: 'mini_social_media',
-            entities: [Users, Time, Posts],
-            autoLoadEntities: true,
+            entities: [Users, Posts, Hashtags],
         }),
         AuthModule,
         UsersModule,
         PostsModule,
+        HashtagsModule,
     ],
     controllers: [AppController],
     providers: [

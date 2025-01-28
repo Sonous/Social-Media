@@ -1,13 +1,23 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { join } from 'path';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { ConfigService } from '@nestjs/config';
+import { UsersModule } from 'src/users/users.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
     imports: [
+        JwtModule.registerAsync({
+            inject: [ConfigService],
+            useFactory: (config: ConfigService) => ({
+                secret: config.get('JWT_SECRET_KEY'),
+                global: true,
+            }),
+        }),
+        forwardRef(() => UsersModule),
         MailerModule.forRootAsync({
             inject: [ConfigService],
             useFactory: async (config: ConfigService) => ({
@@ -33,8 +43,8 @@ import { ConfigService } from '@nestjs/config';
             }),
         }),
     ],
+    exports: [AuthService, JwtModule],
     controllers: [AuthController],
     providers: [AuthService],
-    exports: [AuthService],
 })
 export class AuthModule {}
