@@ -2,6 +2,7 @@ import { Column, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColum
 import { Time } from './time.entity';
 import { Users } from './user.entity';
 import { Hashtags } from './hashtags.entity';
+import { MediaType } from 'src/posts/post.interface';
 
 @Entity()
 export class Posts extends Time {
@@ -17,7 +18,7 @@ export class Posts extends Time {
             from: (value: string) => JSON.parse(value),
         },
     })
-    medias: string[];
+    medias: MediaType[];
 
     @Column()
     userId: string;
@@ -38,4 +39,18 @@ export class Posts extends Time {
         },
     })
     hashtags: Hashtags[];
+
+    @ManyToMany(() => Users, (user) => user.savedPosts)
+    @JoinTable({
+        name: 'saved',
+        joinColumn: {
+            name: 'post_id',
+            referencedColumnName: 'id',
+        },
+        inverseJoinColumn: {
+            name: 'user_id',
+            referencedColumnName: 'id',
+        },
+    })
+    savedBy: Users[];
 }

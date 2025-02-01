@@ -40,10 +40,21 @@ export class UsersController {
         };
     }
 
+    @Get()
+    async getUserByUsername(@Query('username') username: string) {
+        return await this.usersService.getUserByUsername(username);
+    }
+
     @UseGuards(JwtGuard)
     @Get(':id/posts')
     async getUserPosts(@Param('id') id: string) {
         return await this.usersService.getUserPosts(id);
+    }
+
+    @UseGuards(JwtGuard)
+    @Get(':id/saved-posts')
+    async getSavedPosts(@Param('id') id: string) {
+        return await this.usersService.getSavedPosts(id);
     }
 
     @Get(':id')

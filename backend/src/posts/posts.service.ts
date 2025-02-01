@@ -13,6 +13,7 @@ export class PostsService {
     ) {}
 
     async addPost(post: Post) {
+        post.content = post.content.replace(/\n\s*\n/g, '\n');
         const words = post.content.split(/\s+/);
         const hashtags = words
             .filter((word) => word.startsWith('#'))
@@ -45,8 +46,14 @@ export class PostsService {
         // Save hashtags
         for (const hashtag of hashtags) {
             if (!hashtag.id) {
-                const { id: hashtagId } = await this.hashtagsService.addHashtag(hashtag);
-                hashtag.id = hashtagId;
+                const existingHashtag = await this.hashtagsService.findHashtagByName(hashtag.name);
+
+                if (!existingHashtag) {
+                    const { id: hashtagId } = await this.hashtagsService.addHashtag(hashtag);
+                    hashtag.id = hashtagId;
+                } else {
+                    hashtag.id = existingHashtag.id;
+                }
             }
 
             await this.postsRepository

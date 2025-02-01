@@ -18,7 +18,11 @@ function DropZone({ setMedias }: { setMedias: MediaState['setMedias']}) {
         });
     }, []);
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
-        onDrop,
+        onDrop, 
+        accept: {
+            "image/*": [],
+            'video/*': [],
+        }
     });
 
     return (

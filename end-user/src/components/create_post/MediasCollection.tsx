@@ -1,5 +1,5 @@
 import { nanoid } from '@reduxjs/toolkit';
-import { CirclePlus } from 'lucide-react';
+import { CirclePlus, CircleX } from 'lucide-react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { SlotItemMapArray, Swapy, utils, createSwapy } from 'swapy';
 
@@ -28,9 +28,11 @@ const MediasCollection = ({ medias, setMedias }: MediaState) => {
         swapyRef.current.onSwapEnd((event) => {
             if (event.hasChanged) {
                 setMedias((prev) => {
-                    const newMedias = prev.map((_, index) => {
-                        return prev.find((item) => item.fileId === event.slotItemMap.asArray[index].item);
-                    }).filter((item): item is CustomFile => item !== undefined);
+                    const newMedias = prev
+                        .map((_, index) => {
+                            return prev.find((item) => item.fileId === event.slotItemMap.asArray[index].item);
+                        })
+                        .filter((item): item is CustomFile => item !== undefined);
 
                     if (newMedias.length > 0) return newMedias;
                     else return prev;
@@ -46,31 +48,46 @@ const MediasCollection = ({ medias, setMedias }: MediaState) => {
     // file input
     const fileRef = useRef<HTMLInputElement>(null);
     function handleSelectMedias(event: React.ChangeEvent<HTMLInputElement>) {
-        const files = Array.from(event.target.files!).map(file => ({
+        const files = Array.from(event.target.files!).map((file) => ({
             file,
-            fileId: nanoid()
+            fileId: nanoid(),
         }));
 
         // console.log(files)
 
         setMedias((prev) => [...prev, ...files]);
-        event.target.value = ''
+        event.target.value = '';
+    }
+
+    const handleDeleteMedia = (id: string) => {
+        setMedias(prev => prev.filter(item => item.fileId !== id))
     }
 
     return (
         <div ref={containerRef} className="flex gap-3 items-center p-3 ">
             <div className="flex gap-3 overflow-auto">
                 {slottedItems.map(({ slotId, itemId, item }) => (
-                    <div key={slotId} data-swapy-slot={slotId} className='shrink-0'>
-                        {item && (
-                            <div data-swapy-item={itemId} key={itemId}>
-                                <img
-                                    src={URL.createObjectURL(item.file)}
-                                    alt={item.file.name}
-                                    className="object-cover w-20 h-20 rounded-xl"
-                                />
-                            </div>
-                        )}
+                    <div key={slotId} data-swapy-slot={slotId} className="shrink-0">
+                        {item &&
+                            (item.file.type.includes('image') ? (
+                                <div data-swapy-item={itemId} key={itemId} className='relative'>
+                                    <img
+                                        src={URL.createObjectURL(item.file)}
+                                        alt={item.file.name}
+                                        className="object-cover w-20 h-20 rounded-xl"
+                                    />
+                                    <CircleX size={20} className='absolute top-1 right-1 cursor-pointer' onClick={() => {
+                                        handleDeleteMedia(item.fileId)
+                                    }}/>
+                                </div>
+                            ) : (
+                                <div data-swapy-item={itemId} key={itemId} className='relative'>
+                                    <video src={URL.createObjectURL(item.file)} className="object-cover w-20 h-20 rounded-xl" disablePictureInPicture></video>
+                                    <CircleX size={20} className='absolute top-1 right-1 cursor-pointer' onClick={() => {
+                                        handleDeleteMedia(item.fileId)
+                                    }} />
+                                </div>
+                            ))}
                     </div>
                 ))}
             </div>

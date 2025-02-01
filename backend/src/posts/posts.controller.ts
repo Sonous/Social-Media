@@ -7,7 +7,7 @@ import { JwtGuard } from 'src/auth/auth.guard';
 export class PostsController {
     constructor(private postsService: PostsService) {}
 
-    @UseGuards(JwtGuard)
+    // @UseGuards(JwtGuard)
     @Post()
     async addPost(@Body() post: CreatePostDto) {
         return await this.postsService.addPost(post);

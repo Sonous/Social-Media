@@ -8,11 +8,20 @@ import { Hashtag } from './hashtag.interface';
 export class HashtagsService {
     constructor(@InjectRepository(Hashtags) private hashtagsRepository: Repository<Hashtags>) {}
 
-    async findHashtagByName(name: string) {
+    async findHashtagsByName(name: string) {
         const hashtags = await this.hashtagsRepository
             .createQueryBuilder('hashtag')
             .where('hashtag.name like :hashtag', { hashtag: `${name}%` })
             .getMany();
+
+        return hashtags;
+    }
+
+    async findHashtagByName(name: string) {
+        const hashtags = await this.hashtagsRepository
+            .createQueryBuilder('hashtag')
+            .where('hashtag.name like :hashtag', { hashtag: `${name}` })
+            .getOne();
 
         return hashtags;
     }

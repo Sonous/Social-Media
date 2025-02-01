@@ -56,6 +56,9 @@ export class Users {
     @ManyToMany(() => Users, (user) => user.followers)
     following: Users[];
 
+    @ManyToMany(() => Posts, (post) => post.savedBy)
+    savedPosts: Posts[];
+
     @CreateDateColumn({ type: 'timestamp', default: new Date() })
     created_at: Date;
 

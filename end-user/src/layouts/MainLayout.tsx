@@ -149,7 +149,7 @@ function MainLayout() {
         <>
             {!isLoading ? (
                 <main className="grid sm:grid-cols-[1fr_10fr] lg:grid-cols-[1fr_5fr]">
-                    <aside className="border-t-2 sm:h-svh sm:border-r-2 max-sm:absolute max-sm:bottom-0 w-full">
+                    <aside className="border-t-2 sm:h-svh sm:border-r-2 max-sm:absolute max-sm:bottom-0 w-full bg-white">
                         <div className="px-2 py-2 sm:py-5 flex h-full flex-col max-lg:items-center">
                             <div className="px-2 py-6 lg:px-3 lg:py-7 flex max-sm:hidden">
                                 <Link to="/">
@@ -193,8 +193,9 @@ function MainLayout() {
                         </div>
                     </aside>
 
-                    <div className="overflow-y-auto">
+                    <div className="overflow-y-auto h-svh">
                         <Outlet />
+                        <div className='h-[100px]'></div>
                     </div>
 
                     {showCreateDialog && <CreateDialog setShowCreateDialog={setShowCreateDialog} />}

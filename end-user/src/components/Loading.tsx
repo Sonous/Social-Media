@@ -10,17 +10,17 @@ type LoadingProps = {
 };
 
 export const Loading = ({ className, size, state }: Partial<LoadingProps>) => {
-    const [dotsState, setDotsState] = useState<string[]>([]);
+    // const [dotsState, setDotsState] = useState<string[]>([]);
 
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setDotsState((prev) => (prev.length > 4 ? [] : [...prev, '.']));
-        }, 500);
+    // useEffect(() => {
+    //     const interval = setInterval(() => {
+    //         setDotsState((prev) => (prev.length > 4 ? [] : [...prev, '.']));
+    //     }, 500);
 
-        return () => {
-            clearInterval(interval);
-        }
-    }, [dotsState]);
+    //     return () => {
+    //         clearInterval(interval);
+    //     }
+    // }, [dotsState]);
 
     return (
         // <DotLottieReact
@@ -39,7 +39,8 @@ export const Loading = ({ className, size, state }: Partial<LoadingProps>) => {
                 })}
             >
                 <LoaderCircle className="animate-spin" size={size} />
-                <p>Loading{dotsState.join('')}</p>
+                {/* <p>Loading{dotsState.join('')}</p> */}
+                <p>Loading...</p>
             </div>
         </div>
     );

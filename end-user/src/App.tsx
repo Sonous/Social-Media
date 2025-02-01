@@ -7,7 +7,9 @@ import Reset from './pages/auth/Reset';
 import { ProtectedRoutes } from './utils/AuthProtectedRoutes';
 import { UnauthorProtectRoute } from './utils/UnauthorProtectRoute';
 import { Inbox } from './pages/Inbox';
-import { Profile } from './pages/Profile';
+import { Profile } from './pages/profile/Profile';
+import Posts from './pages/profile/Posts';
+import Saved from './pages/profile/Saved';
 
 function App() {
     return (
@@ -16,8 +18,11 @@ function App() {
                 <Route element={<ProtectedRoutes />}>
                     <Route element={<MainLayout />}>
                         <Route index element={<Home />} />
-                        <Route path='/inbox' element={<Inbox />} />
-                        <Route path='/:username' element={<Profile />} />
+                        <Route path="/inbox" element={<Inbox />} />
+                        <Route path="/:username" element={<Profile />} >
+                            <Route index element={<Posts />} />
+                            <Route path="saved" element={<Saved />} />
+                        </Route>
                     </Route>
                 </Route>
 

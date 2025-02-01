@@ -65,6 +65,58 @@ export class UsersService {
         return user;
     }
 
+    async getUserByUsername(username: string) {
+        const user = await this.usersRepository.findOne({
+            select: {
+                id: true,
+                name: true,
+                username: true,
+                email: true,
+                avatar_url: true,
+                bio: true,
+                created_at: true,
+            },
+            where: {
+                username,
+            },
+        });
+
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+
+        return user;
+    }
+
+    async getUserPosts(id: string) {
+        const user = await this.usersRepository
+            .createQueryBuilder('user')
+            .leftJoinAndSelect('user.posts', 'post')
+            .where('user.id = :id', { id })
+            .orderBy('post.created_at', 'DESC')
+            .getOne();
+
+        // const user = await this.usersRepository.findOne({
+        //     select: {
+        //         posts: true,
+        //     },
+        //     relations: {
+        //         posts: true,
+        //     },
+        //     where: {
+        //         id,
+        //     },
+        // });
+
+        if (!user) {
+            throw new NotFoundException('User not found', {
+                description: `User with id ${id} not found`,
+            });
+        }
+
+        return user.posts;
+    }
+
     async updateUserById(id: string, user: Partial<UserInterface>) {
         if (user.password) {
             user.password = await this.authService.hashPassword(user.password);
@@ -78,19 +130,19 @@ export class UsersService {
             .execute();
     }
 
-    async getUserPosts(id: string) {
-        const user = await this.usersRepository
-            .createQueryBuilder('user')
-            .leftJoinAndSelect('user.posts', 'post')
-            .where('user.id = :id', { id })
-            .getOne();
+    async getSavedPosts(userId: string) {
+        const savedPosts = await this.usersRepository.findOne({
+            select: {
+                savedPosts: true,
+            },
+            where: {
+                id: userId,
+            },
+            relations: {
+                savedPosts: true,
+            },
+        });
 
-        if (!user) {
-            throw new NotFoundException('User not found', {
-                description: `User with id ${id} not found`,
-            });
-        }
-
-        return user.posts;
+        return savedPosts.savedPosts;
     }
 }

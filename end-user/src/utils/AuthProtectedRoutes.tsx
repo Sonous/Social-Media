@@ -22,6 +22,7 @@ export const ProtectedRoutes = () => {
     useEffect(() => {
         if (!isError && !isLoading && data) {
             dispatch(setUser(data));
+            setIsLogged(true);
         } else if (isError) {
             if (error.status === 401) {
                 dropStorage();
@@ -33,8 +34,8 @@ export const ProtectedRoutes = () => {
 
     return isLogged ? (
         <>
-            {isLoading && <Loading />}
-            <Outlet />
+            {isLoading ? <Loading /> : <Outlet />}
+            
         </>
     ) : (
         <Navigate to="/login" />

@@ -8,7 +8,7 @@ export class HashtagsController {
 
     @Get()
     async findHashtagByName(@Query('name') name: string) {
-        return await this.hashtagsService.findHashtagByName(name);
+        return await this.hashtagsService.findHashtagsByName(name);
     }
 
     @Post()

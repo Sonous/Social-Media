@@ -30,7 +30,7 @@ type ManageDialogState = {
 const initialDialogState: ManageDialogState = {
     currentPart: 'selectMedia',
     enableParts: ['selectMedia'],
-}
+};
 
 const CreateDialog = ({
     setShowCreateDialog,
@@ -47,7 +47,11 @@ const CreateDialog = ({
 
     const handleHideDialog = (event: React.MouseEvent) => {
         if (dialogRef.current && !dialogRef.current.contains(event.target as Node)) {
-            // setShowCreateDialog(false);
+            if (medias.length === 0) {
+                setShowCreateDialog(false);
+                return;
+            }
+
             setShowDiscardDialog(true);
         }
     };
@@ -68,25 +72,40 @@ const CreateDialog = ({
     // TODO: handle send post to supabase and backend
     const handleSendPost = async () => {
         try {
-            setIsLoading(true)
+            setIsLoading(true);
 
-            const uploadPromises = medias.map((media) =>
-                supabase.storage.from('post_medias').upload(`/${user.id}/${media.file.name}`, media.file, {
-                    upsert: true
-                }),
-            );
+            const uploadPromises = medias.map(async (media) => {
+                const { data } = await supabase.storage
+                    .from('post_medias')
+                    .upload(`/${user.id}/${media.file.name}`, media.file, {
+                        upsert: true,
+                    });
+
+                return {
+                    type: media.file.type.split('/')[0],
+                    data,
+                };
+            });
             const uploadResults = await Promise.all(uploadPromises);
 
-            const urlPromises = uploadResults.map((result) => {
+            const urlResults = uploadResults.map((result) => {
                 if (result.data) {
-                    return supabase.storage.from('post_medias').getPublicUrl(result.data.path);
-                }
-            });
-            const urlResults = await Promise.all(urlPromises)
+                    const {data: { publicUrl}} = supabase.storage.from('post_medias').getPublicUrl(result.data.path);
 
+                    return {
+                        type: result.type,
+                        url: publicUrl
+                    };
+                }
+            }) as MediaType[];
+
+            // TODO: pass object media following pattern: { type: string, url: string }
+            // console.log(uploadResults);
+            // console.log(urlResults);
+            // console.log(medias);
             const { data: { message }} = await postApis.addPost({
                 content,
-                medias: urlResults.map(result => result?.data?.publicUrl ?? ''),
+                medias: urlResults,
                 userId: user.id
             })
 
@@ -96,22 +115,21 @@ const CreateDialog = ({
             }
         } catch (error) {
             console.log(error);
-        }
-        finally{
-            setIsLoading(false)
+        } finally {
+            setIsLoading(false);
         }
     };
-
-    console.log(user)
+    // [0].replace(/\n\s*\n/g, '<br>')
+    console.log(content.split(' '))
 
     return (
         <>
-            {isLoading && <Loading state='full' size={30}/>}
+            {isLoading && <Loading state="full" size={30} />}
             <div
                 className="h-svh bg-black bg-opacity-50 flex-center absolute z-̀50 w-full px-10"
                 onClick={handleHideDialog}
             >
-                <div ref={dialogRef} className="bg-white max-w-[650px] rounded-xl">
+                <div ref={dialogRef} className="bg-white max-w-[750px] rounded-xl">
                     <header className="flex-center p-3 border-b-[1px]">
                         {medias.length === 0 ? (
                             <h1 className="font-semibold">Create new post</h1>
@@ -145,14 +163,14 @@ const CreateDialog = ({
                                 {medias.length > 0 && (
                                     <>
                                         <MediasCollection medias={medias} setMedias={setMedias} />
-                                        <MediasCarousel medias={medias} className="rounded-b-xl w-full" />
+                                        <MediasCarousel medias={medias} className="rounded-b-xl h-[500px] w-full" />
                                     </>
                                 )}
                             </>
                         )}
                         {dialogState.currentPart === 'editPost' && (
                             <div className="grid grid-cols-[1.5fr_1fr]">
-                                <MediasCarousel medias={medias} className="rounded-bl-lg" />
+                                <MediasCarousel medias={medias} className="rounded-bl-lg h-[450px] w-full" />
                                 <EditPost content={content} setContent={setContent} />
                             </div>
                         )}

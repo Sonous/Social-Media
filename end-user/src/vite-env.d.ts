@@ -1,21 +1,21 @@
 /// <reference types="vite/client" />
+
 declare type User = {
     id: string;
     name: string;
     username: string;
     email: string;
+    password?: string;
     avatar_url: string;
     bio: string;
-    // created_at: string;
-    // updated_at: string;
+    created_at?: string
+    updated_at?: string
 }
 
 declare type Time = {
     created_at: string;
     updated_at: string;
 }
-
-
 
 declare type NavItem = {
     iconElement: JSX.Element;
@@ -27,22 +27,9 @@ declare type NavItem = {
 declare type Post = Time & {
     id: string;
     content: string;
-    medias: string[];
+    medias: MediaType[];
 }
 
-declare type CraeteUser = {
-    id: string;
-    name: string;
-    username: string;
-    email: string;
-    password?: string;
-    avatar_url: string;
-    bio: string;
-};
-
-declare type Profile = CraeteUser & {
-    posts: Post[]
-}
 
 declare type CustomFile = {
     file: File;
@@ -54,3 +41,19 @@ declare type MediaState = {
     setMedias: React.Dispatch<React.SetStateAction<CustomFile[]>>
 }
 
+type ProfileState = 'self' | 'other' | '';
+
+type ProfileContext = {
+    profiltState: ProfileState;
+    profile: Profile;
+};
+
+declare type VideoProps = {
+    url: string,
+    className?: string
+}
+
+declare type MediaType = {
+    type: 'image' | 'video';
+    url: string;
+};
