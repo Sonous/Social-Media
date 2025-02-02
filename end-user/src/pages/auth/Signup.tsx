@@ -8,11 +8,11 @@ import classNames from 'classnames';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import authApis from '@/apis/auth';
+import authApis from '@/apis/auth.api';
 import useDebounce from '@/hooks/useDebounce';
 import { useToast } from '@/hooks/use-toast';
 import Timer from '@/components/Timer';
-import userApis from '@/apis/users';
+import userApis from '@/apis/users.api';
 
 const formSchema = z.object({
     email: z.string().min(1, { message: 'Email is required.' }).email({ message: 'Invalid email address' }),

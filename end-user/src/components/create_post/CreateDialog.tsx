@@ -17,7 +17,7 @@ import EditPost from './edit_post/EditPost';
 import supabase from '@/utils/supabase';
 import { useAppSelector } from '@/hooks/reduxHooks';
 import { selectUser } from '@/store/slices/UserSlice';
-import postApis from '@/apis/posts';
+import postApis from '@/apis/posts.api';
 import { Loading } from '../Loading';
 
 type DialogState = 'selectMedia' | 'editPost';

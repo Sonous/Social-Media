@@ -6,7 +6,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Link, useNavigate } from 'react-router';
-import authApis from '@/apis/auth';
+import authApis from '@/apis/auth.api';
 import { useAppDispatch } from '@/hooks/reduxHooks';
 import { setUser } from '@/store/slices/UserSlice';
 // import supabase from '@/utils/supabase';

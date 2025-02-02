@@ -4,7 +4,7 @@ import React, { useCallback } from 'react';
 import { MentionsInput, Mention, DataFunc } from 'react-mentions';
 import defaultStyle from './defaultStyle';
 import defaultMentionStyle from './defaultMentionStyle';
-import hashtagApis from '@/apis/hashtag';
+import hashtagApis from '@/apis/hashtag.api';
 import { debounce } from '@/utils/debounce';
 
 const EditPost = ({

@@ -1,8 +1,18 @@
-import { Column, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+    Column,
+    Entity,
+    JoinColumn,
+    JoinTable,
+    ManyToMany,
+    ManyToOne,
+    OneToMany,
+    PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Time } from './time.entity';
 import { Users } from './user.entity';
 import { Hashtags } from './hashtags.entity';
 import { MediaType } from 'src/posts/post.interface';
+import { Saved } from './saved.entity';
 
 @Entity()
 export class Posts extends Time {
@@ -21,9 +31,10 @@ export class Posts extends Time {
     medias: MediaType[];
 
     @Column()
-    userId: string;
+    user_id: string;
 
     @ManyToOne(() => Users, (user) => user.posts)
+    @JoinColumn({ name: 'user_id' })
     user: Users;
 
     @ManyToMany(() => Hashtags, (hashtags) => hashtags.posts)
@@ -40,17 +51,17 @@ export class Posts extends Time {
     })
     hashtags: Hashtags[];
 
-    @ManyToMany(() => Users, (user) => user.savedPosts)
-    @JoinTable({
-        name: 'saved',
-        joinColumn: {
-            name: 'post_id',
-            referencedColumnName: 'id',
-        },
-        inverseJoinColumn: {
-            name: 'user_id',
-            referencedColumnName: 'id',
-        },
-    })
-    savedBy: Users[];
+    @OneToMany(() => Saved, (saved) => saved.post)
+    // @JoinTable({
+    //     name: 'saved',
+    //     joinColumn: {
+    //         name: 'post_id',
+    //         referencedColumnName: 'id',
+    //     },
+    //     inverseJoinColumn: {
+    //         name: 'user_id',
+    //         referencedColumnName: 'id',
+    //     },
+    // })
+    savedBy: Saved[];
 }

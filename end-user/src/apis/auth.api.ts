@@ -1,6 +1,6 @@
 import axiosInstance from '@/configs/axios.config';
 import { AxiosResponse } from 'axios';
-import userApis from './users';
+import userApis from './users.api';
 
 const authApis = {
     sendOpt(email: string) {

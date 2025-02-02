@@ -30,6 +30,12 @@ declare type Post = Time & {
     medias: MediaType[];
 }
 
+declare type SavedPost = {
+    user_id: string;
+    post_id: string;
+    post: Post
+}
+
 
 declare type CustomFile = {
     file: File;

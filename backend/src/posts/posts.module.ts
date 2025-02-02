@@ -7,7 +7,8 @@ import { HashtagsModule } from 'src/hashtags/hashtags.module';
 import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Posts]), forwardRef(() => HashtagsModule), AuthModule],
+    imports: [TypeOrmModule.forFeature([Posts]), forwardRef(() => HashtagsModule), forwardRef(() => AuthModule)],
+    exports: [PostsService],
     controllers: [PostsController],
     providers: [PostsService],
 })

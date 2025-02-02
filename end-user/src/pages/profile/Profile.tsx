@@ -1,4 +1,4 @@
-import userApis from '@/apis/users';
+import userApis from '@/apis/users.api';
 import { Loading } from '@/components/Loading';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -50,7 +50,7 @@ export const Profile = () => {
     }, [location, user]);
 
     return (
-        <div className="sm:profile-width sm:p-5 m-auto py-10">
+        <div className="sm:profile-width sm:p-5 m-auto pt-10">
             {!profiltState && !profile ? (
                 <Loading />
             ) : (

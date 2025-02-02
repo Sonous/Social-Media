@@ -33,30 +33,10 @@ const userApis = {
     getUserByUsername(username: string) {
         return axiosInstance.get(`/users`, {
             params: {
-                username
-            }
-        })
+                username,
+            },
+        });
     },
-
-    getUserPosts(id: string) {
-        const { access_token } = JSON.parse(localStorage.getItem('auth_info') || '{}')
-        
-        return axiosInstance.get(`/users/${id}/posts`, {
-            headers: {
-                Authorization: `Bearer ${access_token}`,
-            }
-        })
-    },
-
-    getSavedPosts(id: string) {
-        const { access_token } = JSON.parse(localStorage.getItem('auth_info') || '{}')
-        
-        return axiosInstance.get(`/users/${id}/saved-posts`, {
-            headers: {
-                Authorization: `Bearer ${access_token}`,
-            }
-        })
-    }
 };
 
 export default userApis;

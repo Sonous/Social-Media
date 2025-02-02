@@ -1,10 +1,41 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Loading } from './Loading';
 
-const PostList = ({ posts }: { posts: Post[] }) => {
+const PostList = ({
+    posts,
+    isFetching,
+    setIsVisible,
+}: {
+    posts: Post[];
+    isFetching: boolean;
+    setIsVisible: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
+    const loadingRef = useRef(null);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                setIsVisible(entry.isIntersecting);
+            },
+            {
+                threshold: 1,
+            },
+        );
+
+        if (loadingRef.current) {
+            observer.observe(loadingRef.current);
+        }
+
+        return () => {
+            if (loadingRef.current) {
+                observer.unobserve(loadingRef.current);
+            }
+        };
+    }, [loadingRef]);
+
     return (
         <>
-            {posts.length > 0 ? (
+            {posts.length > 0 && (
                 <div className="grid grid-cols-3 gap-2 px-2">
                     {posts.map((post) => (
                         <div key={post.id}>
@@ -22,8 +53,11 @@ const PostList = ({ posts }: { posts: Post[] }) => {
                         </div>
                     ))}
                 </div>
-            ) : (
-                <Loading />
+            )}
+            {isFetching && (
+                <div ref={loadingRef} className="my-10">
+                    <Loading />
+                </div>
             )}
         </>
     );

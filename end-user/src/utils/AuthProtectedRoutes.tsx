@@ -1,4 +1,4 @@
-import userApis from '@/apis/users';
+import userApis from '@/apis/users.api';
 import { Loading } from '@/components/Loading';
 import { useAppDispatch } from '@/hooks/reduxHooks';
 import useLocalStorage from '@/hooks/useLocalStorage';

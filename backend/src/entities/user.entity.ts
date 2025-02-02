@@ -10,6 +10,7 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 import { Posts } from './post.entity';
+import { Saved } from './saved.entity';
 
 @Entity()
 export class Users {
@@ -34,9 +35,7 @@ export class Users {
     @Column()
     bio: string;
 
-    @OneToMany(() => Posts, (post) => post.user, {
-        cascade: true,
-    })
+    @OneToMany(() => Posts, (post) => post.user)
     posts: Posts[];
 
     @ManyToMany(() => Users, (user) => user.following)
@@ -56,8 +55,8 @@ export class Users {
     @ManyToMany(() => Users, (user) => user.followers)
     following: Users[];
 
-    @ManyToMany(() => Posts, (post) => post.savedBy)
-    savedPosts: Posts[];
+    @OneToMany(() => Saved, (saved) => saved.user)
+    savedPosts: Saved[];
 
     @CreateDateColumn({ type: 'timestamp', default: new Date() })
     created_at: Date;

@@ -3,7 +3,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AuthService } from 'src/auth/auth.service';
 import { Users } from 'src/entities/user.entity';
 import { Repository } from 'typeorm';
-import { UserInterface } from './user.interface';
+import { UserInterface } from './interfaces/user.interface';
+import { PostsService } from 'src/posts/posts.service';
+import { DEFAULT_LIMIT, DEFAULT_OFFSET } from 'src/constants';
 
 type ValidateUsername = {
     isValid: boolean;
@@ -12,9 +14,13 @@ type ValidateUsername = {
 
 @Injectable()
 export class UsersService {
+    private readonly offset: number = DEFAULT_OFFSET;
+    private readonly limit: number = DEFAULT_LIMIT;
+
     constructor(
         @InjectRepository(Users) private usersRepository: Repository<Users>,
         private authService: AuthService,
+        private postsService: PostsService,
     ) {}
 
     async validateUsername(username: string): Promise<ValidateUsername> {
@@ -88,35 +94,6 @@ export class UsersService {
         return user;
     }
 
-    async getUserPosts(id: string) {
-        const user = await this.usersRepository
-            .createQueryBuilder('user')
-            .leftJoinAndSelect('user.posts', 'post')
-            .where('user.id = :id', { id })
-            .orderBy('post.created_at', 'DESC')
-            .getOne();
-
-        // const user = await this.usersRepository.findOne({
-        //     select: {
-        //         posts: true,
-        //     },
-        //     relations: {
-        //         posts: true,
-        //     },
-        //     where: {
-        //         id,
-        //     },
-        // });
-
-        if (!user) {
-            throw new NotFoundException('User not found', {
-                description: `User with id ${id} not found`,
-            });
-        }
-
-        return user.posts;
-    }
-
     async updateUserById(id: string, user: Partial<UserInterface>) {
         if (user.password) {
             user.password = await this.authService.hashPassword(user.password);
@@ -128,21 +105,5 @@ export class UsersService {
             .set(user)
             .where('id = :id', { id })
             .execute();
-    }
-
-    async getSavedPosts(userId: string) {
-        const savedPosts = await this.usersRepository.findOne({
-            select: {
-                savedPosts: true,
-            },
-            where: {
-                id: userId,
-            },
-            relations: {
-                savedPosts: true,
-            },
-        });
-
-        return savedPosts.savedPosts;
     }
 }

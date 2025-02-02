@@ -12,6 +12,8 @@ import { Posts } from './entities/post.entity';
 import { APP_PIPE } from '@nestjs/core';
 import { HashtagsModule } from './hashtags/hashtags.module';
 import { Hashtags } from './entities/hashtags.entity';
+import { Saved } from './entities/saved.entity';
+import { SavedModule } from './saved/saved.module';
 
 @Module({
     imports: [
@@ -23,12 +25,13 @@ import { Hashtags } from './entities/hashtags.entity';
             username: process.env.DB_USERNAME,
             password: process.env.DB_PASSWORD,
             database: 'mini_social_media',
-            entities: [Users, Posts, Hashtags],
+            entities: [Users, Posts, Hashtags, Saved],
         }),
         AuthModule,
         UsersModule,
         PostsModule,
         HashtagsModule,
+        SavedModule,
     ],
     controllers: [AppController],
     providers: [
@@ -36,6 +39,14 @@ import { Hashtags } from './entities/hashtags.entity';
         {
             provide: APP_PIPE,
             useClass: ValidationPipe,
+        },
+        {
+            provide: 'DEFAULT_OFFSET',
+            useValue: 10,
+        },
+        {
+            provide: 'DEFAULT_LIMIT',
+            useValue: 10,
         },
     ],
 })
