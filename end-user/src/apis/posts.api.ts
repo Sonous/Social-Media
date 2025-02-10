@@ -23,6 +23,19 @@ const postApis = {
             }
         })
     },
+
+    getAllPosts(page: number){
+        const { access_token } = JSON.parse(localStorage.getItem('auth_info') || '{}')
+        
+        return axiosInstance.get(`/posts`, {
+            headers: {
+                Authorization: `Bearer ${access_token}`,
+            },
+            params: {
+                page
+            }
+        })
+    }
 };
 
 export default postApis;

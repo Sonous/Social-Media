@@ -90,11 +90,13 @@ const CreateDialog = ({
 
             const urlResults = uploadResults.map((result) => {
                 if (result.data) {
-                    const {data: { publicUrl}} = supabase.storage.from('post_medias').getPublicUrl(result.data.path);
+                    const {
+                        data: { publicUrl },
+                    } = supabase.storage.from('post_medias').getPublicUrl(result.data.path);
 
                     return {
                         type: result.type,
-                        url: publicUrl
+                        url: publicUrl,
                     };
                 }
             }) as MediaType[];
@@ -103,15 +105,17 @@ const CreateDialog = ({
             // console.log(uploadResults);
             // console.log(urlResults);
             // console.log(medias);
-            const { data: { message }} = await postApis.addPost({
+            const {
+                data: { message },
+            } = await postApis.addPost({
                 content,
                 medias: urlResults,
-                userId: user.id
-            })
+                userId: user.id,
+            });
 
             if (message) {
-                setDialogState(initialDialogState)
-                setShowCreateDialog(false)
+                setDialogState(initialDialogState);
+                setShowCreateDialog(false);
             }
         } catch (error) {
             console.log(error);
@@ -120,7 +124,7 @@ const CreateDialog = ({
         }
     };
     // [0].replace(/\n\s*\n/g, '<br>')
-    console.log(content.split(' '))
+    // console.log(content.split(' '));
 
     return (
         <>
@@ -163,14 +167,26 @@ const CreateDialog = ({
                                 {medias.length > 0 && (
                                     <>
                                         <MediasCollection medias={medias} setMedias={setMedias} />
-                                        <MediasCarousel medias={medias} className="rounded-b-xl h-[500px] w-full" />
+                                        <MediasCarousel
+                                            medias={medias.map((media) => ({
+                                                type: media.file.type.split('/')[0] as MediaType['type'],
+                                                url: URL.createObjectURL(media.file),
+                                            }))}
+                                            className="rounded-b-xl h-[500px] w-full"
+                                        />
                                     </>
                                 )}
                             </>
                         )}
                         {dialogState.currentPart === 'editPost' && (
                             <div className="grid grid-cols-[1.5fr_1fr]">
-                                <MediasCarousel medias={medias} className="rounded-bl-lg h-[450px] w-full" />
+                                <MediasCarousel
+                                    medias={medias.map((media) => ({
+                                        type: media.file.type.split('/')[0] as MediaType['type'],
+                                        url: URL.createObjectURL(media.file),
+                                    }))}
+                                    className="rounded-bl-lg h-[450px] w-full"
+                                />
                                 <EditPost content={content} setContent={setContent} />
                             </div>
                         )}

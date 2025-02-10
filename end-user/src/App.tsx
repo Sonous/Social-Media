@@ -19,7 +19,7 @@ function App() {
                     <Route element={<MainLayout />}>
                         <Route index element={<Home />} />
                         <Route path="/inbox" element={<Inbox />} />
-                        <Route path="/:username" element={<Profile />} >
+                        <Route path="/:username" element={<Profile />}>
                             <Route index element={<Posts />} />
                             <Route path="saved" element={<Saved />} />
                         </Route>

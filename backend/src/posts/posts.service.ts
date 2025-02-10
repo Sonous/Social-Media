@@ -96,4 +96,16 @@ export class PostsService {
             totalPage: Math.ceil(quantity / limit),
         };
     }
+
+    async getAllPosts(page: number) {
+        const offset = page * this.defaultOffset - this.defaultOffset;
+        const limit = this.defaultLimit;
+
+        const posts = await this.postsRepository.find({
+            take: limit,
+            skip: offset,
+        });
+
+        return posts;
+    }
 }

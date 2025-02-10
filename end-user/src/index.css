@@ -77,3 +77,23 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Tùy chỉnh thanh cuộn cho toàn bộ trang */
+* {
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: rgba(0, 0, 0, 0.3) transparent;
+}
+
+/* Dành cho WebKit (Chrome, Edge, Safari) */
+*::-webkit-scrollbar {
+  width: 8px; /* Độ rộng scrollbar */
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.3); /* Màu scrollbar */
+  border-radius: 4px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent; /* Ẩn phần track */
+}

@@ -23,7 +23,7 @@ const Posts = () => {
                     data: { posts, totalPage },
                 } = await postApis.getPostsByUserId(profile.id, currentPage);
 
-                if (currentPage === totalPage) {
+                if (totalPage === 0 || currentPage === totalPage) {
                     setIsFetching(false);
                 } else {
                     setCurrentPage((prev) => prev + 1);
@@ -42,11 +42,7 @@ const Posts = () => {
         }
     }, [profile, isVisible]);
 
-    // console.log(isVisible);
-
-    return (
-        <PostList posts={posts} isFetching={isFetching} setIsVisible={setIsVisible} />
-    );
+    return <PostList posts={posts} isFetching={isFetching} setIsVisible={setIsVisible} />;
 };
 
 export default Posts;

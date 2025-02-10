@@ -9,7 +9,7 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<'input'>>(
         const [typeInput, setTypeInput] = React.useState(type);
 
         return (
-            <div className="relative">
+            <div className="relative w-full">
                 <input
                     type={typeInput}
                     className={cn(

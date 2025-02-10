@@ -3,7 +3,7 @@ import { CircleChevronLeft, CircleChevronRight } from 'lucide-react';
 import React, { memo } from 'react';
 import Video from '../Video';
 
-const MediasCarousel = ({ medias, className }: { medias: MediaState['medias']; className?: string }) => {
+const MediasCarousel = ({ medias, className }: { medias: MediaType[]; className?: string }) => {
     const [api, setApi] = React.useState<CarouselApi>();
     // const [current, setCurrent] = React.useState(0);
     // const [count, setCount] = React.useState(0);
@@ -26,15 +26,10 @@ const MediasCarousel = ({ medias, className }: { medias: MediaState['medias']; c
             <CarouselContent>
                 {medias?.map((media, index) => (
                     <CarouselItem key={index}>
-                        {media.file.type.includes('image') ? (
-                            <img
-                                src={URL.createObjectURL(media.file)}
-                                alt={media.file.name}
-                                className={`object-cover aspect-[4/3] ${className}`}
-                            />
+                        {media.type === 'image' ? (
+                            <img src={media.url} className={`object-cover aspect-[4/3] ${className}`} />
                         ) : (
-                            // <ReactPlayer url={URL.createObjectURL(media.file)} height={500}/>
-                            <Video src={URL.createObjectURL(media.file)} className={`object-cover aspect-[4/3] ${className}`} />
+                            <Video src={media.url} className={`object-cover aspect-[4/3] ${className}`} />
                         )}
                     </CarouselItem>
                 ))}

@@ -23,7 +23,7 @@ const Saved = () => {
                     data: { savedPosts, totalPage },
                 } = await savedApis.getSavedPostsByUserId(profile.id, currentPage);
 
-                if (currentPage === totalPage) {
+                if (totalPage === 0 || currentPage === totalPage) {
                     setIsFetching(false);
                 } else {
                     setCurrentPage((prev) => prev + 1);

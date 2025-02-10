@@ -1,5 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import { Loading } from './Loading';
+import { PostModalContext } from '@/context/PostModalProvider';
+import Post from './Post';
+import { useInView } from 'motion/react';
 
 const PostList = ({
     posts,
@@ -11,46 +14,40 @@ const PostList = ({
     setIsVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
     const loadingRef = useRef(null);
+    const inView = useInView(loadingRef);
+    // const { setIsOpenPostModal, setPost } = useContext(PostModalContext);
 
     useEffect(() => {
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                setIsVisible(entry.isIntersecting);
-            },
-            {
-                threshold: 1,
-            },
-        );
+        setIsVisible(inView);
+    }, [inView]);
 
-        if (loadingRef.current) {
-            observer.observe(loadingRef.current);
-        }
+    // useEffect(() => {
+    //     const observer = new IntersectionObserver(
+    //         ([entry]) => {
+    //             setIsVisible(entry.isIntersecting);
+    //         },
+    //         {
+    //             threshold: 1,
+    //         },
+    //     );
 
-        return () => {
-            if (loadingRef.current) {
-                observer.unobserve(loadingRef.current);
-            }
-        };
-    }, [loadingRef]);
+    //     if (loadingRef.current) {
+    //         observer.observe(loadingRef.current);
+    //     }
+
+    //     return () => {
+    //         if (loadingRef.current) {
+    //             observer.unobserve(loadingRef.current);
+    //         }
+    //     };
+    // }, [loadingRef]);
 
     return (
         <>
             {posts.length > 0 && (
                 <div className="grid grid-cols-3 gap-2 px-2">
                     {posts.map((post) => (
-                        <div key={post.id}>
-                            {post.medias[0].type === 'image' ? (
-                                <img
-                                    src={post.medias[0].url}
-                                    className="max-h-[200px] md:max-h-[300px] h-full w-full object-cover"
-                                />
-                            ) : (
-                                <video
-                                    src={post.medias[0].url}
-                                    className="max-h-[200px] md:max-h-[300px] h-full w-full object-cover"
-                                />
-                            )}
-                        </div>
+                        <Post key={post.id} type="simple" post={post} />
                     ))}
                 </div>
             )}

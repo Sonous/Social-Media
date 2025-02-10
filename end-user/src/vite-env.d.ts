@@ -4,10 +4,13 @@ declare type User = {
     id: string;
     name: string;
     username: string;
-    email: string;
+    email?: string;
     password?: string;
     avatar_url: string;
-    bio: string;
+    bio?: string;
+    posts: number,
+    followers?: number,
+    following?: number,
     created_at?: string
     updated_at?: string
 }
@@ -28,6 +31,7 @@ declare type Post = Time & {
     id: string;
     content: string;
     medias: MediaType[];
+    user_id: string;
 }
 
 declare type SavedPost = {
@@ -35,7 +39,6 @@ declare type SavedPost = {
     post_id: string;
     post: Post
 }
-
 
 declare type CustomFile = {
     file: File;
@@ -63,3 +66,8 @@ declare type MediaType = {
     type: 'image' | 'video';
     url: string;
 };
+
+declare type Relation = {
+    followers: User[],
+    following: User[]
+}

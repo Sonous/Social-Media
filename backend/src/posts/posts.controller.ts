@@ -13,6 +13,14 @@ export class PostsController {
         return await this.postsService.addPost(post);
     }
 
+    @Get()
+    async getAllPosts(@Query('page') page: number) {
+        if (!page) throw new BadRequestException('Page is required');
+        if (page < 1) throw new BadRequestException('Page must be greater than 0');
+
+        return await this.postsService.getAllPosts(page);
+    }
+
     @Get('/users/:userId')
     async getPostsByUserId(@Param('userId') userId: string, @Query('page') page: number) {
         if (!page) throw new BadRequestException('Page is required');

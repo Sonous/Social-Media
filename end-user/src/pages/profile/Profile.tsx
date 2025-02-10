@@ -1,5 +1,6 @@
 import userApis from '@/apis/users.api';
 import { Loading } from '@/components/Loading';
+import RelationDialog from '@/components/RelationDialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useAppSelector } from '@/hooks/reduxHooks';
@@ -12,6 +13,8 @@ export const Profile = () => {
     const [profiltState, setProfileState] = useState<ProfileState>('');
     const [path, setPath] = useState<string[]>([]);
     const [profile, setProfile] = useState<User>();
+    const [openFollowers, setOpenFollowers] = useState(false);
+    const [openFollowing, setOpenFollowing] = useState(false);
     const location = useLocation();
     const user = useAppSelector(selectUser);
     const navigate = useNavigate();
@@ -68,7 +71,7 @@ export const Profile = () => {
                         <section className="text-[20px] flex max-sm:flex-col max-sm:items-start gap-5 items-center">
                             <span>{profile?.username}</span>
                             {profiltState === 'self' ? (
-                                <div className='flex itemx-center gap-2'>
+                                <div className="flex itemx-center gap-2">
                                     <Button variant={'secondary'}>Edit profile</Button>
                                     <button>
                                         <Settings2 />
@@ -81,15 +84,15 @@ export const Profile = () => {
 
                         <section className="flex sm:gap-5 max-sm:justify-evenly py-3 max-sm:border-t-2 max-sm:col-span-2 max-sm:row-start-5 max-sm:row-end--1">
                             <button className="cursor-text">
-                                <span className="font-bold">0 </span>
+                                <span className="font-bold">{profile?.posts} </span>
                                 posts
                             </button>
-                            <button>
-                                <span className="font-bold">0 </span>
+                            <button onClick={() => setOpenFollowers(true)}>
+                                <span className="font-bold">{profile?.followers} </span>
                                 followers
                             </button>
-                            <button>
-                                <span className="font-bold">0 </span>
+                            <button onClick={() => setOpenFollowing(true)}>
+                                <span className="font-bold">{profile?.following} </span>
                                 following
                             </button>
                         </section>
@@ -136,6 +139,8 @@ export const Profile = () => {
                     />
                 </>
             )}
+            {openFollowers && <RelationDialog type="followers" userId={profile?.id} setOpenDialog={setOpenFollowers} profiltState={profiltState} />}
+            {openFollowing && <RelationDialog type="following" userId={profile?.id} setOpenDialog={setOpenFollowing} profiltState={profiltState} />}
         </div>
     );
 };

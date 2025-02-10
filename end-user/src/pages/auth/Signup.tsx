@@ -25,15 +25,18 @@ const formSchema = z.object({
             message:
                 'Invalid password. Please make sure your password is at least 8 characters long and contains an uppercase letter, a lowercase letter, a number, and a special character.',
         }),
-    username: z.string().min(1, { message: 'Username is required.' }),
+    username: z
+        .string()
+        .min(1, { message: 'Username is required.' })
+        .regex(/^\S*$/, { message: 'Username cannot contain spaces.' })
 });
 
 function Signup() {
     const [disabledInputs, setDisabledInputs] = useState(['otp', 'info']);
     const [isMounted, setIsMounted] = useState(false);
     const [showTimer, setShowTimer] = useState(false);
-    const navigate = useNavigate()
-    const { toast } = useToast()
+    const navigate = useNavigate();
+    const { toast } = useToast();
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -55,14 +58,14 @@ function Signup() {
                 email: values.email,
                 password: values.password,
                 avatar_url: '',
-                bio: ''
-            }
+                bio: '',
+            };
 
-            await userApis.addUser(newUser)
+            await userApis.addUser(newUser);
 
-            navigate('/login')
+            navigate('/login');
         } catch (error) {
-            console.log('Signup error', error)
+            console.log('Signup error', error);
         }
     }
 
@@ -75,14 +78,14 @@ function Signup() {
                 // TODO: Add loading effect
                 await authApis.sendOpt(form.getValues('email'));
                 setDisabledInputs((prev) => [...prev.filter((item) => item !== 'otp'), 'email']);
-                setShowTimer(true)
+                setShowTimer(true);
             }
         } catch (error) {
-            if(error.status === 401) {
+            if (error.status === 401) {
                 form.setError('email', {
                     type: 'custom',
                     message: 'Email have been used. Please use another one.',
-                })
+                });
                 return;
             }
             console.log('Send otp error', error);
@@ -99,7 +102,7 @@ function Signup() {
 
         async function checkOtp() {
             const isValid = await form.trigger('otp');
-            
+
             if (!isValid) {
                 console.log('otp invalid');
                 return;
@@ -109,16 +112,16 @@ function Signup() {
                 const { data } = await authApis.checkOtp(otpDebounce);
 
                 if (data.isValid) {
-                    setDisabledInputs(prev => [...prev.filter(item => item !== 'info'), 'otp', 'getOtp'])
+                    setDisabledInputs((prev) => [...prev.filter((item) => item !== 'info'), 'otp', 'getOtp']);
                     toast({
                         title: 'Success',
                         description: 'OTP is valid',
-                    })
+                    });
                 } else {
                     form.setError('otp', {
                         type: 'custom',
                         message: 'Invalid OTP',
-                    })
+                    });
                 }
             } catch (error) {
                 console.log('error check otp', error);
@@ -127,11 +130,12 @@ function Signup() {
     }, [otpDebounce]);
 
     // check username
-    const usernameDebouce = useDebounce(form.watch('username'), 500)
+    const usernameDebouce = useDebounce(form.watch('username'), 500).toLowerCase();
 
     useEffect(() => {
         if (isMounted) {
             checkUsername();
+            // console.log(usernameDebouce.toLowerCase())
         } else setIsMounted(true);
 
         async function checkUsername() {
@@ -143,26 +147,25 @@ function Signup() {
             }
 
             try {
-                const { data } = await userApis.checkUsername(usernameDebouce)
+                const { data } = await userApis.checkUsername(usernameDebouce);
 
-                if(!data.isValid) {
+                if (!data.isValid) {
                     form.setError('username', {
                         type: 'custom',
                         message: 'Username is taken. Please choose another one.',
-                    })
+                    });
                 } else {
                     //TODO: process sign up action
                     toast({
                         title: 'Success',
                         description: 'Username is valid',
-                    })
+                    });
                 }
             } catch (error) {
-                console.log(error)
+                console.log(error);
             }
         }
-    }, [usernameDebouce])
-
+    }, [usernameDebouce]);
 
     return (
         <div className="flex-center min-h-svh">
@@ -173,9 +176,7 @@ function Signup() {
                 </h1>
 
                 <Form {...form}>
-                    <form
-                        className="flex flex-col gap-5 w-full"
-                    >
+                    <form className="flex flex-col gap-5 w-full">
                         <div>
                             <FormField
                                 control={form.control}
@@ -191,18 +192,20 @@ function Signup() {
 
                                         <FormDescription className="flex justify-end">
                                             <span
-                                                className={classNames(" font-medium", {
-                                                    "text-cerulean  cursor-pointer": !showTimer && !disabledInputs.includes('getOtp'),
-                                                    "text-cerulean-200 cursor-not-allowed": showTimer || disabledInputs.includes('getOtp'),
+                                                className={classNames(' font-medium', {
+                                                    'text-cerulean  cursor-pointer':
+                                                        !showTimer && !disabledInputs.includes('getOtp'),
+                                                    'text-cerulean-200 cursor-not-allowed':
+                                                        showTimer || disabledInputs.includes('getOtp'),
                                                 })}
                                                 onClick={() => {
-                                                    if(!showTimer && !disabledInputs.includes('getOtp')) {
-                                                        handleSendOTP()
+                                                    if (!showTimer && !disabledInputs.includes('getOtp')) {
+                                                        handleSendOTP();
                                                     }
                                                 }}
                                             >
                                                 Get OTP
-                                                {showTimer && <Timer duration={60} setShowTimer={setShowTimer}/>}
+                                                {showTimer && <Timer duration={60} setShowTimer={setShowTimer} />}
                                             </span>
                                         </FormDescription>
                                     </FormItem>
@@ -217,7 +220,7 @@ function Signup() {
                                     <FormItem>
                                         <FormLabel>OTP</FormLabel>
                                         <FormControl>
-                                            <Input  type="text"  {...field} />
+                                            <Input type="text" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -270,18 +273,22 @@ function Signup() {
                             />
                         </div>
 
-                        <Button type='button' className="w-full bg-picton_blue hover:bg-blue_(ncs)" onClick={async () => {
-                            const { invalid: usernameInvalid } = form.getFieldState('username')
-                            const { invalid: emailInvalid } = form.getFieldState('email')
+                        <Button
+                            type="button"
+                            className="w-full bg-picton_blue hover:bg-blue_(ncs)"
+                            onClick={async () => {
+                                const { invalid: usernameInvalid } = form.getFieldState('username');
+                                const { invalid: emailInvalid } = form.getFieldState('email');
 
-                            if(!usernameInvalid && !emailInvalid) {
-                                const isFormValid = await form.trigger()
+                                if (!usernameInvalid && !emailInvalid) {
+                                    const isFormValid = await form.trigger();
 
-                                if(isFormValid) {
-                                    handleSignup(form.getValues())
+                                    if (isFormValid) {
+                                        handleSignup(form.getValues());
+                                    }
                                 }
-                            } 
-                        }}>
+                            }}
+                        >
                             Sign up
                         </Button>
 
