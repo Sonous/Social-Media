@@ -3,13 +3,14 @@ import { AlignJustify, Bell, Bookmark, House, Search, Send, Settings2, SquarePlu
 import NavItem from '@/components/NavItem';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useAnimate } from 'motion/react';
-import { useAppSelector } from '@/hooks/reduxHooks';
-import { selectUser } from '@/store/slices/UserSlice';
+import { useAppDispatch, useAppSelector } from '@/hooks/reduxHooks';
+import { clearUser, selectUser } from '@/store/slices/UserSlice';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Loading } from '@/components/Loading';
 import CreateDialog from '@/components/create_post/CreateDialog';
 import { PostModalContext } from '@/context/PostModalProvider';
 import Post from '@/components/Post';
+import CustomAvatar from '@/components/CustomAvatar';
 
 const initNavItem: NavItem[] = [
     {
@@ -49,6 +50,7 @@ function MainLayout() {
     const moreRef = useRef<HTMLButtonElement | null>(null);
     const [scope, animate] = useAnimate<HTMLDivElement>();
     const user = useAppSelector(selectUser);
+    const dispatch = useAppDispatch();
     const { isOpenPostModal, post } = useContext(PostModalContext);
 
     const location = useLocation();
@@ -126,12 +128,7 @@ function MainLayout() {
                 const newNavItems = [
                     ...prev,
                     {
-                        iconElement: (
-                            <Avatar>
-                                <AvatarImage src={user.avatar_url} />
-                                <AvatarFallback>{user.username}</AvatarFallback>
-                            </Avatar>
-                        ),
+                        iconElement: <CustomAvatar avatar_url={user.avatar_url} username={user.username} />,
                         label: 'Profile',
                         link: `/${user.username}`,
                         isActive: false,
@@ -149,7 +146,7 @@ function MainLayout() {
     }, [user]);
 
     return (
-        <div className='relative'>
+        <div className="relative">
             {!isLoading ? (
                 <main className="grid sm:grid-cols-[1fr_10fr] lg:grid-cols-[1fr_5fr]">
                     <aside className="border-t-2 sm:h-svh sm:border-r-2 max-sm:absolute max-sm:bottom-0 w-full bg-white">
@@ -175,7 +172,7 @@ function MainLayout() {
                             <div className="relative max-sm:hidden">
                                 <div
                                     ref={scope}
-                                    className="flex-col gap-2 absolute bg-white w-[200px] rounded-md p-3 shadow-md -right-[220px] -top-[120px] lg:-right-10 lg:-top-[170px] hidden"
+                                    className="flex-col gap-2 absolute z-50 bg-white w-[200px] rounded-md p-3 shadow-md -right-[220px] -top-[120px] lg:-right-10 lg:-top-[170px] hidden"
                                 >
                                     <Link to="/">
                                         <NavItem iconElement={<Bookmark />} label="Bookmarks" applyMediaQuery={false} />
@@ -184,10 +181,13 @@ function MainLayout() {
                                         <NavItem iconElement={<Settings2 />} label="Settings" applyMediaQuery={false} />
                                     </Link>
                                     <div className="w-full h-[1px] bg-[#b6b6b6]"></div>
-                                    <button onClick={() => {
-                                        localStorage.removeItem('auth_info')
-                                        navigate('/login')
-                                    }}>
+                                    <button
+                                        onClick={() => {
+                                            dispatch(clearUser());
+                                            localStorage.removeItem('auth_info');
+                                            navigate('/login');
+                                        }}
+                                    >
                                         <NavItem label="Logout" applyMediaQuery={false} />
                                     </button>
                                 </div>

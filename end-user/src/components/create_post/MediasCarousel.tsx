@@ -22,10 +22,10 @@ const MediasCarousel = ({ medias, className }: { medias: MediaType[]; className?
     // }, [api]);
 
     return (
-        <Carousel setApi={setApi} className="w-fit">
-            <CarouselContent>
+        <Carousel setApi={setApi} className="h-full">
+            <CarouselContent className="h-full">
                 {medias?.map((media, index) => (
-                    <CarouselItem key={index}>
+                    <CarouselItem key={index} >
                         {media.type === 'image' ? (
                             <img src={media.url} className={`object-cover aspect-[4/3] ${className}`} />
                         ) : (

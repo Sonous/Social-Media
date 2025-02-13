@@ -1,7 +1,7 @@
 import axiosInstance from '@/configs/axios.config';
 
 const postApis = {
-    async addPost(post: { content: string; medias: MediaType[]; userId: string }) {
+    async addPost(post: { content: string; medias: MediaType[]; user_id: string }) {
         const auth_info = JSON.parse(localStorage.getItem('auth_info') || '{}');
 
         return await axiosInstance.post<{ message: string }>('/posts', post, {

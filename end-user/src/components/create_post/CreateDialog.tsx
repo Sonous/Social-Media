@@ -69,6 +69,8 @@ const CreateDialog = ({
         }
     };
 
+    console.log(user)
+
     // TODO: handle send post to supabase and backend
     const handleSendPost = async () => {
         try {
@@ -110,7 +112,7 @@ const CreateDialog = ({
             } = await postApis.addPost({
                 content,
                 medias: urlResults,
-                userId: user.id,
+                user_id: user.id,
             });
 
             if (message) {

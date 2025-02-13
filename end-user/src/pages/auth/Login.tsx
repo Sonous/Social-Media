@@ -41,6 +41,7 @@ function Login() {
         try {
             const userInfo = await authApis.login(values.email, values.password);
 
+            console.log(userInfo);
             dispatch(setUser(userInfo));
             navigate('/');
         } catch (error) {

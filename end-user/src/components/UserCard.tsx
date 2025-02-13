@@ -50,8 +50,8 @@ const UserCard = ({
         }
     }
 
-    console.log(user.id)
-    console.log(currentUser.id)
+    // console.log(user.id)
+    // console.log(currentUser.id)
 
     return (
         <div className="px-3 flex justify-between">
@@ -63,7 +63,7 @@ const UserCard = ({
 
                 <div>
                     <p className="font-semibold text-sm">{user.username}</p>
-                    <p className="text-[#b6b6b6] text-sm">{user.name}</p>
+                    <p className="text-[#646464] text-sm">{user.name}</p>
                 </div>
             </div>
 

@@ -42,6 +42,8 @@ const Posts = () => {
         }
     }, [profile, isVisible]);
 
+    console.log(posts)
+
     return <PostList posts={posts} isFetching={isFetching} setIsVisible={setIsVisible} />;
 };
 

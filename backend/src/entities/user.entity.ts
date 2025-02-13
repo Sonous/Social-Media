@@ -1,4 +1,3 @@
-import { Time } from 'src/entities/time.entity';
 import {
     Column,
     CreateDateColumn,
@@ -11,6 +10,7 @@ import {
 } from 'typeorm';
 import { Posts } from './post.entity';
 import { Saved } from './saved.entity';
+import { Comments } from './comment.entity';
 
 @Entity()
 export class Users {
@@ -59,6 +59,15 @@ export class Users {
 
     @OneToMany(() => Saved, (saved) => saved.user)
     savedPosts: Saved[];
+
+    @ManyToMany(() => Posts, (post) => post.userInteractions)
+    interactedPosts: Posts[];
+
+    @OneToMany(() => Comments, (comment) => comment.user)
+    comments: Comments[];
+
+    @ManyToMany(() => Comments, (comment) => comment.interactedUsers)
+    interactedComments: Comments[];
 
     @CreateDateColumn({ type: 'timestamp', default: new Date() })
     created_at: Date;

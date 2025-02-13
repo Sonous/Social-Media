@@ -1,11 +1,7 @@
-import React from 'react'
+import React from 'react';
 
 const Video = ({ src, className }: React.HTMLProps<HTMLVideoElement>) => {
-  return (
-    <div>
-        <video src={src} controls autoPlay loop disablePictureInPicture className={className} ></video>
-    </div>
-  )
-}
+    return <video src={src} controls  loop disablePictureInPicture className={className}></video>;
+};
 
-export default Video
+export default Video;

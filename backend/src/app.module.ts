@@ -14,6 +14,8 @@ import { HashtagsModule } from './hashtags/hashtags.module';
 import { Hashtags } from './entities/hashtags.entity';
 import { Saved } from './entities/saved.entity';
 import { SavedModule } from './saved/saved.module';
+import { Comments } from './entities/comment.entity';
+import { CommentsModule } from './comments/comments.module';
 
 @Module({
     imports: [
@@ -25,13 +27,14 @@ import { SavedModule } from './saved/saved.module';
             username: process.env.DB_USERNAME,
             password: process.env.DB_PASSWORD,
             database: 'mini_social_media',
-            entities: [Users, Posts, Hashtags, Saved],
+            entities: [Users, Posts, Hashtags, Saved, Comments],
         }),
         AuthModule,
         UsersModule,
         PostsModule,
         HashtagsModule,
         SavedModule,
+        CommentsModule,
     ],
     controllers: [AppController],
     providers: [

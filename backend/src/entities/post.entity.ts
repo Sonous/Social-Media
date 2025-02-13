@@ -13,6 +13,7 @@ import { Users } from './user.entity';
 import { Hashtags } from './hashtags.entity';
 import { MediaType } from 'src/posts/post.interface';
 import { Saved } from './saved.entity';
+import { Comments } from './comment.entity';
 
 @Entity()
 export class Posts extends Time {
@@ -52,16 +53,22 @@ export class Posts extends Time {
     hashtags: Hashtags[];
 
     @OneToMany(() => Saved, (saved) => saved.post)
-    // @JoinTable({
-    //     name: 'saved',
-    //     joinColumn: {
-    //         name: 'post_id',
-    //         referencedColumnName: 'id',
-    //     },
-    //     inverseJoinColumn: {
-    //         name: 'user_id',
-    //         referencedColumnName: 'id',
-    //     },
-    // })
     savedBy: Saved[];
+
+    @ManyToMany(() => Users, (user) => user.interactedPosts)
+    @JoinTable({
+        name: 'post_interactions',
+        joinColumn: {
+            name: 'post_id',
+            referencedColumnName: 'id',
+        },
+        inverseJoinColumn: {
+            name: 'user_id',
+            referencedColumnName: 'id',
+        },
+    })
+    userInteractions: Users[];
+
+    @OneToMany(() => Comments, (comment) => comment.post)
+    comments: Comments[];
 }

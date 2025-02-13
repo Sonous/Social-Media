@@ -18,6 +18,7 @@ const PostList = ({
     // const { setIsOpenPostModal, setPost } = useContext(PostModalContext);
 
     useEffect(() => {
+        console.log(inView)
         setIsVisible(inView);
     }, [inView]);
 

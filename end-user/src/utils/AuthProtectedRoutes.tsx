@@ -11,16 +11,21 @@ export const ProtectedRoutes = () => {
     const { getItem, dropStorage } = useLocalStorage('auth_info');
     const [isLogged, setIsLogged] = useState(getItem('isLogged'));
     const dispatch = useAppDispatch();
-    const { data, isError, isLoading, error } = useQuery({
+    const { data, isError, isLoading, isFetching, error } = useQuery({
         queryKey: ['user'],
         queryFn: async () => {
             const access_token = getItem('access_token');
+            console.log('fjaisdji', access_token)
             return await userApis.getUserByToken(access_token);
         },
     });
 
+    // console.log(isFetching)
+
     useEffect(() => {
-        if (!isError && !isLoading && data) {
+        if (!isError && !isFetching && data) {
+            // console.log(data)
+
             dispatch(setUser(data));
             setIsLogged(true);
         } else if (isError) {
@@ -30,7 +35,7 @@ export const ProtectedRoutes = () => {
             }
             console.log(error);
         }
-    }, [isError, isLoading]);
+    }, [isError, isFetching, data]);
 
     return isLogged ? (
         <>

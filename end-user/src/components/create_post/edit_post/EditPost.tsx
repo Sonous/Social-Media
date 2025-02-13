@@ -6,6 +6,7 @@ import defaultStyle from './defaultStyle';
 import defaultMentionStyle from './defaultMentionStyle';
 import hashtagApis from '@/apis/hashtag.api';
 import { debounce } from '@/utils/debounce';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const EditPost = ({
     content,
@@ -36,7 +37,10 @@ const EditPost = ({
     return (
         <div className="border-l-[1px]">
             <div className="flex p-3 gap-3 items-center">
-                <img src={user?.avatar_url} alt="profile" className="w-8 h-8 rounded-full" />
+                <Avatar>
+                    <AvatarImage src={user.avatar_url} />
+                    <AvatarFallback>{user.username}</AvatarFallback>
+                </Avatar>
                 <h1 className="font-medium">{user?.username}</h1>
             </div>
             <div className="border-b-[1px]">

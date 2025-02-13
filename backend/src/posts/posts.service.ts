@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Posts } from 'src/entities/post.entity';
 import { Repository } from 'typeorm';
@@ -107,5 +107,68 @@ export class PostsService {
         });
 
         return posts;
+    }
+
+    async addPostInteraction(post_id: string, user_id: string) {
+        const interaction = await this.checkInteraction(post_id, user_id);
+
+        if (interaction) {
+            throw new ConflictException('The interaction has already existed');
+        }
+
+        await this.postsRepository
+            .createQueryBuilder('post')
+            .relation(Posts, 'userInteractions')
+            .of(post_id)
+            .add(user_id);
+
+        return {
+            status: 'add success',
+            data: {
+                post_id,
+                user_id,
+            },
+        };
+    }
+
+    async removePostInteraction(post_id: string, user_id: string) {
+        const interaction = await this.checkInteraction(post_id, user_id);
+
+        if (!interaction) {
+            throw new NotFoundException('Not found interaction!');
+        }
+
+        await this.postsRepository
+            .createQueryBuilder('post')
+            .relation(Posts, 'userInteractions')
+            .of(post_id)
+            .remove(user_id);
+
+        return {
+            status: 'remove success',
+            data: {
+                post_id,
+                user_id,
+            },
+        };
+    }
+
+    async checkInteraction(post_id: string, user_id: string) {
+        const interaction = await this.postsRepository
+            .createQueryBuilder('post')
+            .innerJoin('post.userInteractions', 'userInteraction', 'userInteraction.id = :user_id', { user_id })
+            .select(['post.id', 'userInteraction.id'])
+            .where('post.id = :post_id', { post_id })
+            .getRawOne();
+
+        if (!interaction) {
+            return {
+                isExists: false,
+            };
+        } else {
+            return {
+                isExists: true,
+            };
+        }
     }
 }

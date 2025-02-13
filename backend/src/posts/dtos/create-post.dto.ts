@@ -11,7 +11,7 @@ export class CreatePostDto {
     medias: MediaType[];
 
     @IsString()
-    userId: string;
+    user_id: string;
 }
 
 export class MediaType {

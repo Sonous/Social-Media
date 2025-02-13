@@ -8,17 +8,17 @@ declare type User = {
     password?: string;
     avatar_url: string;
     bio?: string;
-    posts: number,
-    followers?: number,
-    following?: number,
-    created_at?: string
-    updated_at?: string
-}
+    posts: number;
+    followers?: number;
+    following?: number;
+    created_at?: string;
+    updated_at?: string;
+};
 
 declare type Time = {
     created_at: string;
     updated_at: string;
-}
+};
 
 declare type NavItem = {
     iconElement: JSX.Element;
@@ -32,23 +32,23 @@ declare type Post = Time & {
     content: string;
     medias: MediaType[];
     user_id: string;
-}
+};
 
 declare type SavedPost = {
     user_id: string;
     post_id: string;
-    post: Post
-}
+    post: Post;
+};
 
 declare type CustomFile = {
     file: File;
     fileId: string;
-}
+};
 
 declare type MediaState = {
     medias: CustomFile[];
-    setMedias: React.Dispatch<React.SetStateAction<CustomFile[]>>
-}
+    setMedias: React.Dispatch<React.SetStateAction<CustomFile[]>>;
+};
 
 type ProfileState = 'self' | 'other' | '';
 
@@ -58,9 +58,9 @@ type ProfileContext = {
 };
 
 declare type VideoProps = {
-    url: string,
-    className?: string
-}
+    url: string;
+    className?: string;
+};
 
 declare type MediaType = {
     type: 'image' | 'video';
@@ -68,6 +68,20 @@ declare type MediaType = {
 };
 
 declare type Relation = {
-    followers: User[],
-    following: User[]
-}
+    followers: User[];
+    following: User[];
+};
+
+declare type Mention = {
+    user_id: string;
+    username: string;
+};
+
+declare type Comment = {
+    content: string;
+    media?: MediaType;
+    mentions?: Mention[];
+    post_id: string;
+    user_id: string;
+    parent_comment_id?: string;
+};

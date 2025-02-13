@@ -3,7 +3,7 @@ export interface Post {
 
     medias: MediaType[];
 
-    userId: string;
+    user_id: string;
 }
 
 export type MediaType = {
