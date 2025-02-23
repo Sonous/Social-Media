@@ -132,10 +132,10 @@ const CreateDialog = ({
         <>
             {isLoading && <Loading state="full" size={30} />}
             <div
-                className="h-svh bg-black bg-opacity-50 flex-center absolute z-̀50 w-full px-10"
+                className="h-svh bg-black bg-opacity-50 flex-center top-0 left-0 absolute z-50 w-full px-10"
                 onClick={handleHideDialog}
             >
-                <div ref={dialogRef} className="bg-white max-w-[750px] rounded-xl">
+                <div ref={dialogRef} className="bg-white max-w-[750px] mx-10 rounded-xl">
                     <header className="flex-center p-3 border-b-[1px]">
                         {medias.length === 0 ? (
                             <h1 className="font-semibold">Create new post</h1>

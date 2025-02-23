@@ -4,13 +4,15 @@ const CustomAvatar = ({
     avatar_url,
     username,
     className,
+    onClick
 }: {
     avatar_url: string;
     username: string;
     className?: string;
+    onClick?: () => void
 }) => {
     return (
-        <Avatar className={className}>
+        <Avatar className={className} onClick={onClick}>
             <AvatarImage src={avatar_url} />
             <AvatarFallback>{username}</AvatarFallback>
         </Avatar>

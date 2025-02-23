@@ -97,7 +97,6 @@ export class UsersController {
         return this.usersService.searchUsers(searchString, page);
     }
 
-    //
     @Get(':id')
     async getUserById(@Param('id') id: string) {
         return await this.usersService.getUserById(id);

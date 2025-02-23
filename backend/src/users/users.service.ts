@@ -261,4 +261,8 @@ export class UsersService {
 
         return users;
     }
+
+    async checkUserExists(userId: string) {
+        return (await this.usersRepository.findOneBy({ id: userId })) || false;
+    }
 }

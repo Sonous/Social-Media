@@ -32,12 +32,14 @@ export class CommentsService {
             throw new BadRequestException('Comment have to include parent_comment_id if mentions exist');
         }
 
-        const newComment = this.commentsRepository
+        const { identifiers } = await this.commentsRepository
             .createQueryBuilder()
             .insert()
             .into(Comments)
             .values(comment)
             .execute();
+
+        const newComment = await this.getCommentById(identifiers[0].id);
 
         return newComment;
     }
@@ -47,7 +49,7 @@ export class CommentsService {
         const offset = page * this.defaultOffset - this.defaultOffset;
         const limit = this.defaultLimit;
 
-        const comments = await this.commentsRepository
+        const [comments, quantity] = await this.commentsRepository
             .createQueryBuilder('comment')
             .innerJoin('comment.user', 'commentOwner')
             .select(['comment', 'commentOwner.name', 'commentOwner.username', 'commentOwner.avatar_url'])
@@ -55,24 +57,24 @@ export class CommentsService {
             .andWhere('comment.parent_comment_id is null')
             .offset(offset)
             .limit(limit)
-            .getMany();
+            .getManyAndCount();
 
         const updatedCommentPromise = comments.map(async (comment) => {
-            const childAmount = await this.commentsRepository
-                .createQueryBuilder('comment')
-                .select(['COUNT(*) as amount'])
-                .where('comment.parent_comment_id = :id', { id: comment.id })
-                .getRawOne();
+            const childAmount = await this.getChildAmountOfComment(comment.id);
 
             return {
                 ...comment,
-                childAmount: parseInt(childAmount.amount),
+                childAmount,
             };
         });
 
         const updateComments = await Promise.all(updatedCommentPromise);
 
-        return updateComments;
+        return {
+            comments: updateComments,
+            quantity,
+            totalPage: Math.ceil(quantity / limit),
+        };
     }
 
     // Lấy ra các comment con của một comment
@@ -138,10 +140,25 @@ export class CommentsService {
             .where('comment.id = :comment_id', { comment_id })
             .getOne();
 
+        const childAmount = await this.getChildAmountOfComment(comment_id);
+
         if (!comment) {
             throw new NotFoundException("Comment doesn't exist");
         }
 
-        return comment;
+        return {
+            ...comment,
+            childAmount,
+        };
+    }
+
+    async getChildAmountOfComment(comment_id: string) {
+        const childAmount = await this.commentsRepository
+            .createQueryBuilder('comment')
+            .select(['COUNT(*) as amount'])
+            .where('comment.parent_comment_id = :comment_id', { comment_id })
+            .getRawOne();
+
+        return parseInt(childAmount.amount);
     }
 }

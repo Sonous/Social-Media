@@ -1,3 +1,4 @@
+import roomApis from '@/apis/room.api';
 import userApis from '@/apis/users.api';
 import { Loading } from '@/components/Loading';
 import RelationDialog from '@/components/RelationDialog';
@@ -5,8 +6,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useAppSelector } from '@/hooks/reduxHooks';
 import { selectUser } from '@/store/slices/UserSlice';
+import supabase from '@/utils/supabase';
 import { Bookmark, Captions, Settings2 } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router';
 
 export const Profile = () => {
@@ -15,9 +17,12 @@ export const Profile = () => {
     const [profile, setProfile] = useState<User>();
     const [openFollowers, setOpenFollowers] = useState(false);
     const [openFollowing, setOpenFollowing] = useState(false);
+    const [relation, setRelation] = useState<Relation | undefined>();
+    const [refresh, setRefresh] = useState(false);
     const location = useLocation();
     const user = useAppSelector(selectUser);
     const navigate = useNavigate();
+    const avatarInputRef = useRef<HTMLInputElement | null>(null);
 
     // determine if the profile is the user's profile or another user's profile
     useEffect(() => {
@@ -41,6 +46,7 @@ export const Profile = () => {
                 if (state === 'other') {
                     const { data } = await userApis.getUserByUsername(username);
                     profile = { ...data };
+                    await checkRelation(user.id, data.id);
                 }
 
                 setProfile({
@@ -50,7 +56,58 @@ export const Profile = () => {
                 console.log(error);
             }
         }
-    }, [location, user]);
+
+        async function checkRelation(currentUserId: string, otherUserId: string) {
+            try {
+                const relation = await userApis.checkRelation(currentUserId, otherUserId);
+
+                setRelation(relation);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+    }, [location, user, refresh]);
+
+    // console.log(relation);
+    const handleChangeAvatar = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (!event.target.files) return;
+        const avatar = event.target.files[0];
+
+        try {
+            const { data } = await supabase.storage.from('avatars').upload(`/${user.id}/${avatar.name}`, avatar, {
+                upsert: true,
+            });
+
+            if (data) {
+                const {
+                    data: { publicUrl },
+                } = supabase.storage.from('avatars').getPublicUrl(data?.path);
+
+                await userApis.updateUser(user.id, {
+                    avatar_url: publicUrl,
+                });
+                user.avatar_url = publicUrl;
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const handleOpenMessage = async () => {
+        if (!profile) return;
+
+        try {
+            let room = await roomApis.getRoomPrivate(user.id, profile.id)
+
+            if (!room) {
+                room = await roomApis.createRoom([user.id, profile.id], 'private');
+            } 
+
+            navigate(`/inbox/${room.id}`);
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
     return (
         <div className="sm:profile-width sm:p-5 m-auto pt-10">
@@ -61,9 +118,23 @@ export const Profile = () => {
                     <header className="grid grid-cols-[150px_1fr] sm:grid-cols-[1fr_2fr] max-sm:gap-3  sm:pb-5">
                         <section className="flex-center sm:row-span-3 sm:py-5">
                             <button>
-                                <Avatar className="w-[100px] h-[100px] sm:w-[150px] sm:h-[150px]">
+                                <Avatar
+                                    className="w-[100px] h-[100px] sm:w-[150px] sm:h-[150px]"
+                                    onClick={() => {
+                                        if (profile?.id !== user.id) return;
+
+                                        avatarInputRef.current?.showPicker();
+                                    }}
+                                >
                                     <AvatarImage src={profile?.avatar_url} className="object-cover" />
                                     <AvatarFallback>{profile?.username}</AvatarFallback>
+                                    <input
+                                        ref={avatarInputRef}
+                                        accept="image/*"
+                                        type="file"
+                                        className="hidden"
+                                        onChange={(e) => handleChangeAvatar(e)}
+                                    />
                                 </Avatar>
                             </button>
                         </section>
@@ -78,7 +149,49 @@ export const Profile = () => {
                                     </button>
                                 </div>
                             ) : (
-                                <div></div>
+                                <div className="space-x-4">
+                                    {relation?.relation === 'following' && (
+                                        <Button
+                                            variant={'secondary'}
+                                            onClick={async () => {
+                                                if (!profile) return;
+
+                                                try {
+                                                    await userApis.removeRelation(user.id, profile?.id);
+                                                    setRefresh(!refresh);
+                                                } catch (error) {
+                                                    console.log(error);
+                                                }
+                                            }}
+                                        >
+                                            Following
+                                        </Button>
+                                    )}
+                                    {relation?.relation === 'none' && (
+                                        <Button
+                                            variant={'secondary'}
+                                            onClick={async () => {
+                                                if (!profile) return;
+
+                                                try {
+                                                    await userApis.addRelation(user.id, profile?.id);
+                                                    setRefresh(!refresh);
+                                                } catch (error) {
+                                                    console.log(error);
+                                                }
+                                            }}
+                                            className="bg-blue-500 hover:bg-blue-400 text-white"
+                                        >
+                                            Follow
+                                        </Button>
+                                    )}
+                                    <Button
+                                        variant={'secondary'}
+                                        onClick={handleOpenMessage}
+                                    >
+                                        Message
+                                    </Button>
+                                </div>
                             )}
                         </section>
 
@@ -139,8 +252,22 @@ export const Profile = () => {
                     />
                 </>
             )}
-            {openFollowers && <RelationDialog type="followers" userId={profile?.id} setOpenDialog={setOpenFollowers} profiltState={profiltState} />}
-            {openFollowing && <RelationDialog type="following" userId={profile?.id} setOpenDialog={setOpenFollowing} profiltState={profiltState} />}
+            {openFollowers && (
+                <RelationDialog
+                    type="followers"
+                    userId={profile?.id}
+                    setOpenDialog={setOpenFollowers}
+                    profiltState={profiltState}
+                />
+            )}
+            {openFollowing && (
+                <RelationDialog
+                    type="following"
+                    userId={profile?.id}
+                    setOpenDialog={setOpenFollowing}
+                    profiltState={profiltState}
+                />
+            )}
         </div>
     );
 };

@@ -1,14 +1,14 @@
-import axiosInstance from "@/configs/axios.config"
+import axiosInstance from '@/configs/axios.config';
 
-const commentApi = {
-    async addComment(comment: Comment) {
+const commentApis = {
+    async addComment(comment: Partial<CustomComment>) {
         const auth_info = JSON.parse(localStorage.getItem('auth_info') || '{}');
 
-        await axiosInstance.post('/comments', comment, {
+        return await axiosInstance.post('/comments', comment, {
             headers: {
                 Authorization: `Bearer ${auth_info?.access_token}`,
             },
-        })
+        });
     },
 
     async removeComment(comment_id: string) {
@@ -18,35 +18,39 @@ const commentApi = {
             headers: {
                 Authorization: `Bearer ${auth_info?.access_token}`,
             },
-        })
+        });
     },
 
     async getParentComments(post_id: string, page: number) {
         const auth_info = JSON.parse(localStorage.getItem('auth_info') || '{}');
 
-        await axiosInstance.get(`/comments/`, {
+        const { data } = await axiosInstance.get(`/comments/`, {
             headers: {
                 Authorization: `Bearer ${auth_info?.access_token}`,
             },
             params: {
                 post_id,
-                page
-            }
-        })
+                page,
+            },
+        });
+
+        return data;
     },
 
-    async getChildComments(parent_comment_id: string, page: string) {
+    async getChildComments(parent_comment_id: string, page: number) {
         const auth_info = JSON.parse(localStorage.getItem('auth_info') || '{}');
 
-        await axiosInstance.get(`/comments/children`, {
+        const { data } = await axiosInstance.get(`/comments/children`, {
             headers: {
                 Authorization: `Bearer ${auth_info?.access_token}`,
             },
             params: {
                 parent_comment_id,
-                page
-            }
-        })
+                page,
+            },
+        });
+
+        return data;
     },
 
     async heartComment(user_id: string, comment_id: string) {
@@ -58,9 +62,9 @@ const commentApi = {
             },
             params: {
                 user_id,
-                comment_id
-            }
-        })
+                comment_id,
+            },
+        });
     },
 
     async deleteHearted(user_id: string, comment_id: string) {
@@ -72,10 +76,20 @@ const commentApi = {
             },
             params: {
                 user_id,
-                comment_id
-            }
-        })
-    }
-}
+                comment_id,
+            },
+        });
+    },
 
-export default commentApi
+    async getCommentById(comment_id: string) {
+        const auth_info = JSON.parse(localStorage.getItem('auth_info') || '{}');
+
+        return await axiosInstance.get(`/comments/${comment_id}`, {
+            headers: {
+                Authorization: `Bearer ${auth_info?.access_token}`,
+            },
+        }); 
+    }
+};
+
+export default commentApis;

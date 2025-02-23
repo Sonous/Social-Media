@@ -32,6 +32,8 @@ declare type Post = Time & {
     content: string;
     medias: MediaType[];
     user_id: string;
+    likeAmount: number;
+    commentAmount: number;
 };
 
 declare type SavedPost = {
@@ -68,8 +70,9 @@ declare type MediaType = {
 };
 
 declare type Relation = {
-    followers: User[];
-    following: User[];
+    currentUserId: string;
+    otherUserId: string;
+    relation: 'following' | 'follower' | 'none';
 };
 
 declare type Mention = {
@@ -77,11 +80,38 @@ declare type Mention = {
     username: string;
 };
 
-declare type Comment = {
+declare type CustomComment = Time & {
+    id: string;
     content: string;
     media?: MediaType;
     mentions?: Mention[];
     post_id: string;
     user_id: string;
     parent_comment_id?: string;
+    childAmount: number;
+    user: User;
 };
+
+
+declare type Room = Time & {
+    id?: string;
+    name: string | null;
+    avatar_url: string | null;
+    type: 'private' | 'group';
+    roomUsers?: RoomUser[];
+    messages?: Message[];
+}
+
+declare type RoomUser = {
+    user_id: string;
+    user: User
+}
+
+declare type Message = Time & {
+    id: string;
+    content: string;
+    medias?: MediaType[] | null;
+    user_id: string;
+    room_id: string;
+    sender: User
+}

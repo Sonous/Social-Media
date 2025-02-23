@@ -1,36 +1,51 @@
-import { Button } from '@/components/ui/button';
-import React, { useCallback, useEffect, useState } from 'react';
-import { motion, useAnimate } from 'motion/react';
+import React, { useEffect, useState } from 'react';
 import postApis from '@/apis/posts.api';
 import Post from '@/components/Post';
 import { useAppSelector } from '@/hooks/reduxHooks';
 import { selectUser } from '@/store/slices/UserSlice';
+import { CirclePlus } from 'lucide-react';
+import { uniqueArr } from '@/utils/uniqueArr';
 
 function Home() {
-    const [posts, setPosts] = useState([]);
+    const [posts, setPosts] = useState<Post[]>([]);
     const user = useAppSelector(selectUser);
+    const [page, setPage] = useState(1);
+    const [showPlusButton, setShowPlusButton] = useState<boolean | undefined>();
 
     useEffect(() => {
         fetchPosts();
 
         async function fetchPosts() {
             try {
-                const { data } = await postApis.getAllPosts(1);
+                const {
+                    data: { posts: fetchingPosts, quantity, totalPage },
+                } = await postApis.getAllPosts(page);
 
-                setPosts(data);
+                console.log(fetchingPosts)
+
+                if (totalPage > page) setShowPlusButton(true);
+                else setShowPlusButton(false);
+
+                const newPosts = [...posts, ...fetchingPosts];
+
+                setPosts(uniqueArr(newPosts));
             } catch (error) {
                 console.log(error);
             }
         }
-    }, []);
-
-    console.log(user)
+    }, [page]);
 
     return (
-        <div className='flex-center flex-col gap-5'>
+        <div className="flex-center flex-col gap-5">
             {posts.map((post, index) => (
-                <Post key={index} type='normal' post={post} />
+                <Post key={index} type="normal" post={post} />
             ))}
+            
+            {showPlusButton && (
+                <div className="p-5">
+                    <CirclePlus className='cursor-pointer' onClick={() => setPage((prev) => prev + 1)} />
+                </div>
+            )}
         </div>
     );
 }

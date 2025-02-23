@@ -5,7 +5,6 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useAnimate } from 'motion/react';
 import { useAppDispatch, useAppSelector } from '@/hooks/reduxHooks';
 import { clearUser, selectUser } from '@/store/slices/UserSlice';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Loading } from '@/components/Loading';
 import CreateDialog from '@/components/create_post/CreateDialog';
 import { PostModalContext } from '@/context/PostModalProvider';
@@ -52,6 +51,8 @@ function MainLayout() {
     const user = useAppSelector(selectUser);
     const dispatch = useAppDispatch();
     const { isOpenPostModal, post } = useContext(PostModalContext);
+
+    console.log(isOpenPostModal)
 
     const location = useLocation();
     const navigate = useNavigate();
@@ -148,8 +149,8 @@ function MainLayout() {
     return (
         <div className="relative">
             {!isLoading ? (
-                <main className="grid sm:grid-cols-[1fr_10fr] lg:grid-cols-[1fr_5fr]">
-                    <aside className="border-t-2 sm:h-svh sm:border-r-2 max-sm:absolute max-sm:bottom-0 w-full bg-white">
+                <main className="flex flex-col sm:grid sm:grid-cols-[1fr_10fr] lg:grid-cols-[1fr_5fr] h-svh">
+                    <aside className="border-t-2 max-sm:order-2 sm:border-r-2 bg-white z-20">
                         <div className="px-2 py-2 sm:py-5 flex h-full flex-col max-lg:items-center">
                             <div className="px-2 py-6 lg:px-3 lg:py-7 flex max-sm:hidden">
                                 <Link to="/">
@@ -199,9 +200,8 @@ function MainLayout() {
                         </div>
                     </aside>
 
-                    <div className="overflow-y-auto h-svh">
+                    <div className="overflow-y-auto max-sm:flex-1 order-1  w-full ">
                         <Outlet />
-                        <div className="h-[100px]"></div>
                     </div>
 
                     {showCreateDialog && <CreateDialog setShowCreateDialog={setShowCreateDialog} />}

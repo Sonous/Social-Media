@@ -35,6 +35,47 @@ const postApis = {
                 page
             }
         })
+    },
+
+    async addInteraction(post_id: string, user_id: string) {
+        const { access_token } = JSON.parse(localStorage.getItem('auth_info') || '{}')
+
+        await axiosInstance.post('/posts/interactions', {
+            post_id,
+            user_id
+        }, {
+            headers: {
+                Authorization: `Bearer ${access_token}`,
+            },
+        })
+    },
+
+    async removeInteraction(post_id: string, user_id: string) {
+        const { access_token } = JSON.parse(localStorage.getItem('auth_info') || '{}')
+
+        await axiosInstance.delete('/posts/interactions', {
+            headers: {
+                Authorization: `Bearer ${access_token}`,
+            },
+            params: {
+                post_id,
+                user_id
+            }
+        })
+    },
+
+    async checkInteraction(post_id: string, user_id: string) {
+        const { access_token } = JSON.parse(localStorage.getItem('auth_info') || '{}')
+
+        return await axiosInstance.get<{ isExists: boolean }>('/posts/check-interaction', {
+            headers: {
+                Authorization: `Bearer ${access_token}`,
+            },
+            params: {
+                post_id,
+                user_id
+            }
+        })
     }
 };
 

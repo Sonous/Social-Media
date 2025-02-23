@@ -80,7 +80,7 @@ export class PostsService {
         const offset = page * this.defaultOffset - this.defaultOffset;
         const limit = this.defaultLimit;
 
-        const [posts, quantity] = await this.postsRepository.findAndCount({
+        const [entityPosts, quantity] = await this.postsRepository.findAndCount({
             where: {
                 user_id: userId,
             },
@@ -91,8 +91,33 @@ export class PostsService {
             skip: offset,
         });
 
+        const amountPromise = entityPosts.map(async (entity) => {
+            const likeAmounts = await this.postsRepository
+                .createQueryBuilder('post')
+                .leftJoin('post.userInteractions', 'interaction')
+                .select(['COUNT(interaction.id) as likeAmount'])
+                .where('post.id = :id', { id: entity.id })
+                .getRawOne();
+
+            const commentAmounts = await this.postsRepository
+                .createQueryBuilder('post')
+                .leftJoin('post.comments', 'comment')
+                .select(['COUNT(comment.id) as commentAmount'])
+                .where('post.id = :id', { id: entity.id })
+                .getRawOne();
+
+            return {
+                ...entity,
+                likeAmount: parseInt(likeAmounts.likeAmount),
+                commentAmount: parseInt(commentAmounts.commentAmount),
+            };
+        });
+
+        const posts = await Promise.all(amountPromise);
+
         return {
             posts,
+            quantity,
             totalPage: Math.ceil(quantity / limit),
         };
     }
@@ -101,18 +126,49 @@ export class PostsService {
         const offset = page * this.defaultOffset - this.defaultOffset;
         const limit = this.defaultLimit;
 
-        const posts = await this.postsRepository.find({
+        const [entityPosts, quantity] = await this.postsRepository.findAndCount({
+            order: {
+                created_at: 'DESC',
+            },
             take: limit,
             skip: offset,
         });
 
-        return posts;
+        const amountPromise = entityPosts.map(async (entity) => {
+            const likeAmounts = await this.postsRepository
+                .createQueryBuilder('post')
+                .leftJoin('post.userInteractions', 'interaction')
+                .select(['COUNT(interaction.id) as likeAmount'])
+                .where('post.id = :id', { id: entity.id })
+                .getRawOne();
+
+            const commentAmounts = await this.postsRepository
+                .createQueryBuilder('post')
+                .leftJoin('post.comments', 'comment')
+                .select(['COUNT(comment.id) as commentAmount'])
+                .where('post.id = :id', { id: entity.id })
+                .getRawOne();
+
+            return {
+                ...entity,
+                likeAmount: parseInt(likeAmounts.likeAmount),
+                commentAmount: parseInt(commentAmounts.commentAmount),
+            };
+        });
+
+        const posts = await Promise.all(amountPromise);
+
+        return {
+            posts,
+            quantity,
+            totalPage: Math.ceil(quantity / limit),
+        };
     }
 
     async addPostInteraction(post_id: string, user_id: string) {
         const interaction = await this.checkInteraction(post_id, user_id);
 
-        if (interaction) {
+        if (interaction.isExists) {
             throw new ConflictException('The interaction has already existed');
         }
 
@@ -134,7 +190,7 @@ export class PostsService {
     async removePostInteraction(post_id: string, user_id: string) {
         const interaction = await this.checkInteraction(post_id, user_id);
 
-        if (!interaction) {
+        if (!interaction.isExists) {
             throw new NotFoundException('Not found interaction!');
         }
 

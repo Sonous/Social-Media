@@ -6,10 +6,11 @@ import Signup from './pages/auth/Signup';
 import Reset from './pages/auth/Reset';
 import { ProtectedRoutes } from './utils/AuthProtectedRoutes';
 import { UnauthorProtectRoute } from './utils/UnauthorProtectRoute';
-import { Inbox } from './pages/Inbox';
+import { Inbox } from './pages/inbox/Inbox';
 import { Profile } from './pages/profile/Profile';
 import Posts from './pages/profile/Posts';
 import Saved from './pages/profile/Saved';
+import ChatRoom from './pages/inbox/ChatRoom';
 
 function App() {
     return (
@@ -18,7 +19,10 @@ function App() {
                 <Route element={<ProtectedRoutes />}>
                     <Route element={<MainLayout />}>
                         <Route index element={<Home />} />
-                        <Route path="/inbox" element={<Inbox />} />
+                        <Route path="/inbox">
+                            <Route index element={<Inbox />} />
+                            <Route path=":roomId" element={<ChatRoom />} />
+                        </Route>
                         <Route path="/:username" element={<Profile />}>
                             <Route index element={<Posts />} />
                             <Route path="saved" element={<Saved />} />

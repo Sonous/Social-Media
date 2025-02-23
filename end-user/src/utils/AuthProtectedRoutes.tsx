@@ -15,7 +15,7 @@ export const ProtectedRoutes = () => {
         queryKey: ['user'],
         queryFn: async () => {
             const access_token = getItem('access_token');
-            console.log('fjaisdji', access_token)
+            // console.log('fjaisdji', access_token)
             return await userApis.getUserByToken(access_token);
         },
     });

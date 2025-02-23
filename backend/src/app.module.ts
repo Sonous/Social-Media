@@ -16,6 +16,10 @@ import { Saved } from './entities/saved.entity';
 import { SavedModule } from './saved/saved.module';
 import { Comments } from './entities/comment.entity';
 import { CommentsModule } from './comments/comments.module';
+import { ChatsModule } from './chats/chats.module';
+import { Rooms } from './entities/room.entity';
+import { Messages } from './entities/message.entity';
+import { RoomsUsers } from './entities/roomsUsers.entity';
 
 @Module({
     imports: [
@@ -27,7 +31,7 @@ import { CommentsModule } from './comments/comments.module';
             username: process.env.DB_USERNAME,
             password: process.env.DB_PASSWORD,
             database: 'mini_social_media',
-            entities: [Users, Posts, Hashtags, Saved, Comments],
+            entities: [Users, Time, Posts, Hashtags, Saved, Comments, Rooms, Messages, RoomsUsers],
         }),
         AuthModule,
         UsersModule,
@@ -35,6 +39,7 @@ import { CommentsModule } from './comments/comments.module';
         HashtagsModule,
         SavedModule,
         CommentsModule,
+        ChatsModule,
     ],
     controllers: [AppController],
     providers: [

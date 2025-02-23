@@ -9,7 +9,7 @@ import { SavedModule } from 'src/saved/saved.module';
 
 @Module({
     imports: [TypeOrmModule.forFeature([Users]), forwardRef(() => AuthModule), PostsModule, SavedModule],
-    exports: [TypeOrmModule],
+    exports: [TypeOrmModule, UsersService],
     controllers: [UsersController],
     providers: [UsersService],
 })

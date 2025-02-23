@@ -11,6 +11,8 @@ import {
 import { Posts } from './post.entity';
 import { Saved } from './saved.entity';
 import { Comments } from './comment.entity';
+import { Messages } from './message.entity';
+import { RoomsUsers } from './roomsUsers.entity';
 
 @Entity()
 export class Users {
@@ -26,6 +28,7 @@ export class Users {
     @Column()
     email: string;
 
+    // @Column({ select: false })
     @Column()
     password: string;
 
@@ -68,6 +71,12 @@ export class Users {
 
     @ManyToMany(() => Comments, (comment) => comment.interactedUsers)
     interactedComments: Comments[];
+
+    @OneToMany(() => Messages, (message) => message.sender)
+    messages: Messages[];
+
+    @OneToMany(() => RoomsUsers, (roomUser) => roomUser.user)
+    roomsUsers: RoomsUsers[];
 
     @CreateDateColumn({ type: 'timestamp', default: new Date() })
     created_at: Date;

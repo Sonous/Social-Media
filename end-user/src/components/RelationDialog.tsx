@@ -50,11 +50,11 @@ const RelationDialog = ({
         }
     }, [searchDebounce, refetching]);
 
-    console.log(relations);
+    // console.log(relations);
 
     return (
         <div
-            className="h-svh bg-black bg-opacity-50 flex-center absolute z-̀50 w-full px-10 top-0 left-0"
+            className="h-svh bg-black bg-opacity-50 flex-center absolute z-̀50 w-full px-10 top-0 left-0 z-[35]"
             onClick={handleHideDialog}
         >
             <div
