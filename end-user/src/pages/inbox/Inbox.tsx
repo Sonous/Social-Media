@@ -1,22 +1,35 @@
 import roomApis from '@/apis/room.api';
 import RoomCard from '@/components/RoomCard';
 import Search from '@/components/Search';
+import { PostModalContext } from '@/context/PostModalProvider';
 import { useAppSelector } from '@/hooks/reduxHooks';
+import useDebounce from '@/hooks/useDebounce';
 import { selectUser } from '@/store/slices/UserSlice';
 import { SquarePen } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 export const Inbox = () => {
     const [rooms, setRooms] = useState<Room[]>([]);
     const user = useAppSelector(selectUser);
     const [searchedString, setSearchedString] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const { setIsShowNavText } = useContext(PostModalContext);
 
     useEffect(() => {
         const fetchRooms = async () => {
             try {
                 const rooms = await roomApis.getRoomsByUserId(user.id);
-                setRooms(rooms);
+                const latestMessagesPromise = rooms.map(async (room) => {
+                    const latestMessage = await roomApis.getLatestMessageByRoomId(room.id);
+
+                    return {
+                        ...room,
+                        latestMessage,
+                    };
+                })
+                const latestMessages = await Promise.all(latestMessagesPromise);
+
+                setRooms(latestMessages);
             } catch (error) {
                 console.log('fetch rooms error', error);
             }
@@ -26,22 +39,58 @@ export const Inbox = () => {
             fetchRooms();
         }
     }, [user]);
-    console.log(rooms);
+
+    // search room
+    const searchInput = useDebounce(searchedString, 500);
+
+    useEffect(() => {
+        const searchRooms = async () => {
+            setIsLoading(true);
+            try {
+                const rooms = await roomApis.searchRooms(searchInput.trim(), user.id);
+                const latestMessagesPromise = rooms.map(async (room) => {
+                    const latestMessage = await roomApis.getLatestMessageByRoomId(room.id);
+
+                    return {
+                        ...room,
+                        latestMessage,
+                    };
+                })
+                const latestMessages = await Promise.all(latestMessagesPromise);
+
+                setRooms(latestMessages);
+            } catch (error) {
+                console.log('search rooms error', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        if(user.id) {
+            searchRooms();
+        }
+    }, [searchInput])
+
+    console.log('rooms', rooms);
 
     return (
-        <div className="flex-center m-10 flex-col">
+        <div className="flex-center m-7 flex-col">
             <div className="w-full max-w-[500px] space-y-5">
                 <section className=" flex justify-between items-center">
                     <h1 className="text-xl font-semibold">Inbox</h1>
-                    <SquarePen />
+                    <SquarePen onClick={() => setIsShowNavText(prev => !prev)}/>
                 </section>
 
                 <Search value={searchedString} setValue={setSearchedString} isLoading={isLoading} />
 
-                <section className="">
-                    {rooms.map((room) => (
-                        <RoomCard room={room} />
-                    ))}
+                <section className="space-y-5">
+                    {rooms.length > 0 ? (
+                        rooms.map((room) => (
+                            <RoomCard key={room.id} room={room} />
+                        ))
+                    ) : (
+                        <h1 className="text-center">No rooms yet</h1>
+                    )}
                 </section>
             </div>
         </div>

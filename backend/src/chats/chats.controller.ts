@@ -32,8 +32,18 @@ export class ChatsController {
         return await this.chatsService.getRoomById(roomId);
     }
 
+    @Get('search-room')
+    async searchRoomsByName(@Query('name') name: string, @Query('userId') userId: string) {
+        return await this.chatsService.getRoomsByName(name, userId);
+    }
+
     @Get('message/:roomId')
     async getMessagesByRoomId(@Param('roomId') roomId: string) {
         return await this.chatsService.getMessagesByRoomId(roomId);
+    }
+
+    @Get('latest-message/:roomId')
+    async getLatestMessageByRoomId(@Param('roomId') roomId: string) {
+        return await this.chatsService.getLatestMessageByRoomId(roomId);
     }
 }

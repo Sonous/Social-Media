@@ -72,7 +72,35 @@ const roomApis = {
         });
 
         return data;
-    }
+    },
+    
+    async getLatestMessageByRoomId(roomId: string) {
+        const { access_token } = JSON.parse(localStorage.getItem('auth_info') || '{}');
+
+        const { data } = await axiosInstance.get<Message>(`/chats/latest-message/${roomId}`, {
+            headers: {
+                Authorization: `Bearer ${access_token}`,
+            },
+        });
+
+        return data;
+    },
+   
+    async searchRooms(name: string, userId: string) {
+        const { access_token } = JSON.parse(localStorage.getItem('auth_info') || '{}');
+
+        const { data } = await axiosInstance.get<Room[]>(`/chats/search-room/`, {
+            headers: {
+                Authorization: `Bearer ${access_token}`,
+            },
+            params: {
+                name,
+                userId,
+            }
+        });
+
+        return data;
+    },
 };
 
 export default roomApis;

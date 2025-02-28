@@ -11,6 +11,9 @@ import { Profile } from './pages/profile/Profile';
 import Posts from './pages/profile/Posts';
 import Saved from './pages/profile/Saved';
 import ChatRoom from './pages/inbox/ChatRoom';
+import NotFound from './pages/NotFound';
+import AccountLayout from './layouts/AccountLayout';
+import EditProfile from './pages/setting/EditProfile';
 
 function App() {
     return (
@@ -27,6 +30,12 @@ function App() {
                             <Route index element={<Posts />} />
                             <Route path="saved" element={<Saved />} />
                         </Route>
+                        <Route path="/accounts" element={<AccountLayout />}>
+                            <Route index element={<NotFound />} />
+                            <Route path="edit" element={<EditProfile />} />
+                        </Route>
+                        <Route path="/not-found" element={<NotFound />} />
+                        <Route path="*" element={<NotFound />} />
                     </Route>
                 </Route>
 

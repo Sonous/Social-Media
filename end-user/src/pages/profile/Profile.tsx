@@ -45,6 +45,8 @@ export const Profile = () => {
             try {
                 if (state === 'other') {
                     const { data } = await userApis.getUserByUsername(username);
+                    console.log(data);
+
                     profile = { ...data };
                     await checkRelation(user.id, data.id);
                 }
@@ -53,6 +55,9 @@ export const Profile = () => {
                     ...profile,
                 });
             } catch (error) {
+                if (error.status === 404) {
+                    navigate('/not-found');
+                }
                 console.log(error);
             }
         }
@@ -97,20 +102,20 @@ export const Profile = () => {
         if (!profile) return;
 
         try {
-            let room = await roomApis.getRoomPrivate(user.id, profile.id)
+            let room = await roomApis.getRoomPrivate(user.id, profile.id);
 
             if (!room) {
                 room = await roomApis.createRoom([user.id, profile.id], 'private');
-            } 
+            }
 
             navigate(`/inbox/${room.id}`);
         } catch (error) {
             console.log(error);
         }
-    }
+    };
 
     return (
-        <div className="sm:profile-width sm:p-5 m-auto pt-10">
+        <div className="py-10 sm:profile-width sm:p-5 m-auto pt-10">
             {!profiltState && !profile ? (
                 <Loading />
             ) : (
@@ -143,7 +148,9 @@ export const Profile = () => {
                             <span>{profile?.username}</span>
                             {profiltState === 'self' ? (
                                 <div className="flex itemx-center gap-2">
-                                    <Button variant={'secondary'}>Edit profile</Button>
+                                    <Button variant={'secondary'} onClick={() => navigate('/accounts/edit')}>
+                                        Edit profile
+                                    </Button>
                                     <button>
                                         <Settings2 />
                                     </button>
@@ -185,10 +192,7 @@ export const Profile = () => {
                                             Follow
                                         </Button>
                                     )}
-                                    <Button
-                                        variant={'secondary'}
-                                        onClick={handleOpenMessage}
-                                    >
+                                    <Button variant={'secondary'} onClick={handleOpenMessage}>
                                         Message
                                     </Button>
                                 </div>

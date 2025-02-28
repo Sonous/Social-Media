@@ -4,7 +4,6 @@ import Post from '@/components/Post';
 import { useAppSelector } from '@/hooks/reduxHooks';
 import { selectUser } from '@/store/slices/UserSlice';
 import { CirclePlus } from 'lucide-react';
-import { uniqueArr } from '@/utils/uniqueArr';
 
 function Home() {
     const [posts, setPosts] = useState<Post[]>([]);
@@ -14,26 +13,25 @@ function Home() {
 
     useEffect(() => {
         fetchPosts();
+    }, []);
 
-        async function fetchPosts() {
-            try {
-                const {
-                    data: { posts: fetchingPosts, quantity, totalPage },
-                } = await postApis.getAllPosts(page);
+    async function fetchPosts() {
+        try {
+            const {
+                data: { posts: fetchingPosts, quantity, totalPage },
+            } = await postApis.getAllPosts(page);
 
-                console.log(fetchingPosts)
+            if (totalPage > page) setShowPlusButton(true);
+            else setShowPlusButton(false);
 
-                if (totalPage > page) setShowPlusButton(true);
-                else setShowPlusButton(false);
+            const newPosts = [...posts, ...fetchingPosts];
 
-                const newPosts = [...posts, ...fetchingPosts];
-
-                setPosts(uniqueArr(newPosts));
-            } catch (error) {
-                console.log(error);
-            }
+            setPosts(newPosts);
+            setPage(page + 1);
+        } catch (error) {
+            console.log(error);
         }
-    }, [page]);
+    }
 
     return (
         <div className="flex-center flex-col gap-5">
@@ -43,7 +41,7 @@ function Home() {
             
             {showPlusButton && (
                 <div className="p-5">
-                    <CirclePlus className='cursor-pointer' onClick={() => setPage((prev) => prev + 1)} />
+                    <CirclePlus className='cursor-pointer' onClick={fetchPosts} />
                 </div>
             )}
         </div>

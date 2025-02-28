@@ -52,8 +52,6 @@ function MainLayout() {
     const dispatch = useAppDispatch();
     const { isOpenPostModal, post } = useContext(PostModalContext);
 
-    console.log(isOpenPostModal)
-
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -117,40 +115,11 @@ function MainLayout() {
         }
     }
 
-    // user
-    useEffect(() => {
-        setIsLoading(true);
-        if (user.id) {
-            setNavItems((prev) => {
-                const isExist = navItems.some((item) => item.label === 'Profile');
-
-                if (isExist) return prev;
-
-                const newNavItems = [
-                    ...prev,
-                    {
-                        iconElement: <CustomAvatar avatar_url={user.avatar_url} username={user.username} />,
-                        label: 'Profile',
-                        link: `/${user.username}`,
-                        isActive: false,
-                    },
-                ];
-
-                if (newNavItems.length > 6) {
-                    newNavItems.pop();
-                }
-
-                return newNavItems;
-            });
-            setIsLoading(false);
-        }
-    }, [user]);
-
     return (
         <div className="relative">
             {!isLoading ? (
-                <main className="flex flex-col sm:grid sm:grid-cols-[1fr_10fr] lg:grid-cols-[1fr_5fr] h-svh">
-                    <aside className="border-t-2 max-sm:order-2 sm:border-r-2 bg-white z-20">
+                <main className="flex h-svh max-sm:flex-col">
+                    <aside className="border-t-2 max-sm:order-2 sm:border-r-2 bg-white z-20 ">
                         <div className="px-2 py-2 sm:py-5 flex h-full flex-col max-lg:items-center">
                             <div className="px-2 py-6 lg:px-3 lg:py-7 flex max-sm:hidden">
                                 <Link to="/">
@@ -158,7 +127,7 @@ function MainLayout() {
                                 </Link>
                             </div>
 
-                            <div className="flex-1 flex flex-col gap-5 max-sm:justify-evenly max-sm:w-full max-sm:flex-row overflow-auto">
+                            <div className="flex-1 flex flex-col gap-3 max-sm:justify-evenly max-sm:w-full max-sm:flex-row overflow-auto">
                                 {navItems.map((navItem, index) => (
                                     <NavItem
                                         key={index}
@@ -168,6 +137,12 @@ function MainLayout() {
                                         onClick={() => handleNavItem(navItem)}
                                     />
                                 ))}
+                                <NavItem
+                                    iconElement={<CustomAvatar avatar_url={user.avatar_url} username={user.username} />}
+                                    label={'Profile'}
+                                    isActive={location.pathname.includes(user.username)}
+                                    onClick={() => navigate(`/${user.username}`)}
+                                />
                             </div>
 
                             <div className="relative max-sm:hidden">
@@ -178,7 +153,7 @@ function MainLayout() {
                                     <Link to="/">
                                         <NavItem iconElement={<Bookmark />} label="Bookmarks" applyMediaQuery={false} />
                                     </Link>
-                                    <Link to="/">
+                                    <Link to="/accounts/edit">
                                         <NavItem iconElement={<Settings2 />} label="Settings" applyMediaQuery={false} />
                                     </Link>
                                     <div className="w-full h-[1px] bg-[#b6b6b6]"></div>
@@ -200,7 +175,7 @@ function MainLayout() {
                         </div>
                     </aside>
 
-                    <div className="overflow-y-auto max-sm:flex-1 order-1  w-full ">
+                    <div className="overflow-y-auto max-sm:flex-1 order-1 w-full ">
                         <Outlet />
                     </div>
 

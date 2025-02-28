@@ -61,14 +61,14 @@ export class ChatsService {
     async getRoomPrivate(currentUserId: string, otherUserId: string) {
         const room = await this.roomsRepository
             .createQueryBuilder('room')
-            .innerJoin('room.roomsUsers', 'roomsUsers')
-            .where('roomsUsers.user_id = :currentUserId', { currentUserId })
+            .innerJoin('room.roomUsers', 'roomUsers')
+            .where('roomUsers.user_id = :currentUserId', { currentUserId })
             .andWhere((qb) => {
                 const subQuery = qb
                     .subQuery()
-                    .select('room.id')
-                    .from(RoomsUsers, 'roomsUsers')
-                    .where('roomsUsers.user_id = :otherUserId', { otherUserId })
+                    .select('room_id')
+                    .from(RoomsUsers, 'roomUsers')
+                    .where('roomUsers.user_id = :otherUserId', { otherUserId })
                     .getQuery();
                 return 'room.id IN ' + subQuery;
             })
@@ -105,6 +105,44 @@ export class ChatsService {
             .select(['room', 'roomUsers.user_id', 'user.username', 'user.avatar_url', 'user.name'])
             .where('room.id = :roomId', { roomId })
             .getOne();
+    }
+
+    async getRoomsByName(name: string, userId: string) {
+        const user = await this.usersService.getUserById(userId);
+
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+
+        return await this.roomsRepository
+            .createQueryBuilder('room')
+            .innerJoin('room.roomUsers', 'roomUsers')
+            .innerJoin('roomUsers.user', 'user')
+            .select(['room', 'roomUsers.user_id', 'user.username', 'user.avatar_url', 'user.name'])
+            .where(
+                new Brackets((qb) => {
+                    qb.where(
+                        new Brackets((qb) => {
+                            qb.where('user.name LIKE :name', { name: `%${name}%` }).andWhere('user.id != :userId', {
+                                userId,
+                            });
+                        }),
+                    ).orWhere('room.name LIKE :name', {
+                        name: `%${name}%`,
+                    });
+                }),
+            )
+            .andWhere((qb) => {
+                const subQuery = qb
+                    .subQuery()
+                    .select('room_id')
+                    .from(RoomsUsers, 'roomUsers')
+                    .where('roomUsers.user_id = :userId', { userId })
+                    .getQuery();
+                return 'room.id IN ' + subQuery;
+            })
+            // .getSql();
+            .getMany();
     }
 
     async checkPermission(roomId: string, userId: string) {
@@ -147,5 +185,15 @@ export class ChatsService {
             .where('message.room_id = :roomId', { roomId })
             .orderBy('message.created_at', 'ASC')
             .getMany();
+    }
+
+    async getLatestMessageByRoomId(roomId: string) {
+        return await this.messagesRepository
+            .createQueryBuilder('message')
+            .innerJoin('message.sender', 'sender')
+            .select(['message', 'sender.username', 'sender.avatar_url', 'sender.name'])
+            .where('message.room_id = :roomId', { roomId })
+            .orderBy('message.created_at', 'DESC')
+            .getOne();
     }
 }

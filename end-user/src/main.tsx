@@ -8,6 +8,8 @@ import { Toaster } from './components/ui/toaster.tsx';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Loading } from './components/Loading.tsx';
 import PostModalProvider from './context/PostModalProvider.tsx';
+import { TooltipProvider } from './components/ui/tooltip.tsx';
+import { ToastContainer } from 'react-toastify';
 
 const queryClient = new QueryClient()
 
@@ -16,10 +18,13 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <Provider store={store}>
             <QueryClientProvider client={queryClient}>
                 <PostModalProvider>
-                    <Suspense fallback={<Loading />}>
-                        <App />
-                        <Toaster />
-                    </Suspense>
+                    <TooltipProvider>
+                        <Suspense fallback={<Loading />}>
+                            <App />
+                            <Toaster />
+                            <ToastContainer />
+                        </Suspense>
+                    </TooltipProvider>
                 </PostModalProvider>
             </QueryClientProvider>
         </Provider>

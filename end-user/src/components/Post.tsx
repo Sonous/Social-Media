@@ -233,7 +233,7 @@ const Post = ({ type, post }: { type: 'simple' | 'normal' | 'modal'; post: Post 
                 >
                     <div
                         ref={postRef}
-                        className={classNames('w-full h-full flex flex-col bg-white mx-10', {
+                        className={classNames('w-full h-full flex flex-col bg-white mx-5', {
                             'max-w-[600px] max-h-[500px] lg:max-w-[650px] lg:max-h-[650px] !ml-16': type === 'modal',
                             'max-w-[400px] md:max-w-[600px] lg:max-w-[700px]': type === 'normal',
                         })}

@@ -94,12 +94,13 @@ declare type CustomComment = Time & {
 
 
 declare type Room = Time & {
-    id?: string;
+    id: string;
     name: string | null;
     avatar_url: string | null;
     type: 'private' | 'group';
     roomUsers?: RoomUser[];
     messages?: Message[];
+    latestMessage?: Message;
 }
 
 declare type RoomUser = {

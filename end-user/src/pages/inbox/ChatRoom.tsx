@@ -107,7 +107,7 @@ const ChatRoom = () => {
     };
 
     return (
-        <div className="py-5 px-10 flex flex-col h-full">
+        <div className="p-5 flex flex-col h-full">
             <section className="border-b-[1px] pb-3">
                 <div className="flex gap-3 items-center">
                     {showAvatar()}
