@@ -69,7 +69,7 @@ const CreateDialog = ({
         }
     };
 
-    console.log(user)
+    // console.log(user)
 
     // TODO: handle send post to supabase and backend
     const handleSendPost = async () => {

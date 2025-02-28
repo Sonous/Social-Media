@@ -116,3 +116,11 @@ declare type Message = Time & {
     room_id: string;
     sender: User
 }
+
+declare type Notification = {
+    id: string;
+    content: string;
+    is_read: boolean;
+    user_id: string;
+    created_at: string;
+}

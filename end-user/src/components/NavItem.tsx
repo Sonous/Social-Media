@@ -34,10 +34,10 @@ function NavItem({
                 >
                     {iconElement}
                     <div
-                        className={classNames(' transition-all', {
+                        className={classNames('transition-all', {
                             'font-semibold': isActive,
                             'hidden lg:block': applyMediaQuery,
-                            '!hidden': !isShowNavText,
+                            '!hidden ': !isShowNavText,
                         })}
                     >
                         {label}

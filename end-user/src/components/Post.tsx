@@ -227,7 +227,7 @@ const Post = ({ type, post }: { type: 'simple' | 'normal' | 'modal'; post: Post 
             {type !== 'simple' && postOwner && (
                 <div
                     className={classNames({
-                        'absolute bg-black top-0 right-0 bg-opacity-50 h-svh w-full flex-center z-30': type === 'modal',
+                        'absolute bg-black top-0 right-0 bg-opacity-50 h-svh w-full flex-center z-30 transition-all': type === 'modal',
                     })}
                     onClick={handleCloseModal}
                 >

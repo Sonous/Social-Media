@@ -90,11 +90,8 @@ export class UsersController {
     }
 
     @Get('search')
-    async searchUsers(@Query('searchString') searchString: string, @Query('page') page: number) {
-        if (!page) throw new BadRequestException('Page is required');
-        if (page < 1) throw new BadRequestException('Page must be greater than 0');
-
-        return this.usersService.searchUsers(searchString, page);
+    async searchUsers(@Query('searchString') searchString: string) {
+        return this.usersService.searchUsers(searchString);
     }
 
     @Get(':id')

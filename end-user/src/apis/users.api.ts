@@ -98,7 +98,7 @@ const userApis = {
         return data
     },
 
-    async searchUsers(searchString: string, page: number) {
+    async searchUsers(searchString: string) {
         const { access_token } = JSON.parse(localStorage.getItem('auth_info') || '{}');
         const { data } = await axiosInstance.get(`/users/search`, {
             headers: {
@@ -106,7 +106,6 @@ const userApis = {
             },
             params: {
                 searchString,
-                page
             }
         });
 

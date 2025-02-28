@@ -246,17 +246,13 @@ export class UsersService {
         };
     }
 
-    async searchUsers(searchString: string, page: number) {
-        const offset = page * this.defautlOffset - this.defautlOffset;
-        const limit = this.defautlLimit;
-
+    async searchUsers(searchString: string) {
         const users = await this.usersRepository
             .createQueryBuilder('user')
             .select(['user.id', 'user.name', 'user.username', 'user.avatar_url'])
             .where('user.username LIKE :searchString', { searchString: `%${searchString}%` })
             .orWhere('user.name LIKE :searchString', { searchString: `%${searchString}%` })
-            .offset(offset)
-            .limit(limit)
+
             .getMany();
 
         return users;
