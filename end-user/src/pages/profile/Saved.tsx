@@ -1,12 +1,10 @@
 import savedApis from '@/apis/saved.api';
-import userApis from '@/apis/users.api';
-import { Loading } from '@/components/Loading';
 import PostList from '@/components/PostList';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router';
 
 const Saved = () => {
-    const { profiltState, profile } = useOutletContext<ProfileContext>();
+    const { profile } = useOutletContext<ProfileContext>();
     const [savedPosts, setSavedPosts] = useState<Post[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [isFetching, setIsFetching] = useState(true);

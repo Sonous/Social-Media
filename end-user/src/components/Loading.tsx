@@ -1,7 +1,5 @@
-import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import classNames from 'classnames';
 import { LoaderCircle } from 'lucide-react';
-import { useEffect, useState } from 'react';
 
 type LoadingProps = {
     className: string;
@@ -29,7 +27,7 @@ export const Loading = ({ className, size, state }: Partial<LoadingProps>) => {
         //     autoplay
         // />
         <div
-            className={classNames('flex-center w-full h-full', {
+            className={classNames(`flex-center w-full h-full ${className}`, {
                 'absolute z-[100] top-0 left-0': state === 'full',
             })}
         >

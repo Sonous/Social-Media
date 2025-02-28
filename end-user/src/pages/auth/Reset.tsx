@@ -1,5 +1,5 @@
 import { Lock } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -11,9 +11,9 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import authApis from '@/apis/auth.api';
 import useDebounce from '@/hooks/useDebounce';
-import { useToast } from '@/hooks/use-toast';
 import Timer from '@/components/Timer';
 import userApis from '@/apis/users.api';
+import { AxiosError } from 'axios';
 
 
 const formSchema = z.object({
@@ -68,14 +68,16 @@ function Reset() {
                 setUserId(data.userId)
             }
         } catch (error) {
-            if(error.status === 404) {
-                form.setError('email', {
-                    type: 'custom',
-                    message: 'Email not found',
-                })
-                return;
+            if (error instanceof AxiosError) {
+                if(error.status === 404) {
+                    form.setError('email', {
+                        type: 'custom',
+                        message: 'Email not found',
+                    })
+                    return;
+                }
+                console.log('Send otp error', error);
             }
-            console.log('Send otp error', error);
         }
     }
 

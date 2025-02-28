@@ -1,13 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import postApis from '@/apis/posts.api';
 import Post from '@/components/Post';
-import { useAppSelector } from '@/hooks/reduxHooks';
-import { selectUser } from '@/store/slices/UserSlice';
 import { CirclePlus } from 'lucide-react';
 
 function Home() {
     const [posts, setPosts] = useState<Post[]>([]);
-    const user = useAppSelector(selectUser);
     const [page, setPage] = useState(1);
     const [showPlusButton, setShowPlusButton] = useState<boolean | undefined>();
 
@@ -18,7 +15,7 @@ function Home() {
     async function fetchPosts() {
         try {
             const {
-                data: { posts: fetchingPosts, quantity, totalPage },
+                data: { posts: fetchingPosts, totalPage },
             } = await postApis.getAllPosts(page);
 
             if (totalPage > page) setShowPlusButton(true);

@@ -17,7 +17,6 @@ export const formatDate = (isoString: string): string => {
         return `${diffInHours} hours ago`;
     }
 
-    const diffInDays = Math.floor(diffInHours / 24);
     const isSameYear = date.getFullYear() === now.getFullYear();
 
     if (isSameYear) {

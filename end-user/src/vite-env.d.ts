@@ -8,7 +8,7 @@ declare type User = {
     password?: string;
     avatar_url: string;
     bio?: string;
-    posts: number;
+    posts?: number;
     followers?: number;
     following?: number;
     created_at?: string;

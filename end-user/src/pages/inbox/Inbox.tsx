@@ -6,7 +6,7 @@ import { useAppSelector } from '@/hooks/reduxHooks';
 import useDebounce from '@/hooks/useDebounce';
 import { selectUser } from '@/store/slices/UserSlice';
 import { SquarePen } from 'lucide-react';
-import React, { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 export const Inbox = () => {
     const [rooms, setRooms] = useState<Room[]>([]);

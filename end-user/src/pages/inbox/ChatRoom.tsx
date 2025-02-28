@@ -5,7 +5,7 @@ import Message from '@/components/Message';
 import { useAppSelector } from '@/hooks/reduxHooks';
 import { selectUser } from '@/store/slices/UserSlice';
 import { uniqueArr } from '@/utils/uniqueArr';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {  useParams } from 'react-router';
 import { io, Socket } from 'socket.io-client';
 

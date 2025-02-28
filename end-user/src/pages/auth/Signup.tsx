@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -13,6 +13,7 @@ import useDebounce from '@/hooks/useDebounce';
 import { useToast } from '@/hooks/use-toast';
 import Timer from '@/components/Timer';
 import userApis from '@/apis/users.api';
+import { AxiosError } from 'axios';
 
 const formSchema = z.object({
     email: z.string().min(1, { message: 'Email is required.' }).email({ message: 'Invalid email address' }),
@@ -28,7 +29,7 @@ const formSchema = z.object({
     username: z
         .string()
         .min(1, { message: 'Username is required.' })
-        .regex(/^\S*$/, { message: 'Username cannot contain spaces.' })
+        .regex(/^\S*$/, { message: 'Username cannot contain spaces.' }),
 });
 
 function Signup() {
@@ -81,14 +82,16 @@ function Signup() {
                 setShowTimer(true);
             }
         } catch (error) {
-            if (error.status === 401) {
-                form.setError('email', {
-                    type: 'custom',
-                    message: 'Email have been used. Please use another one.',
-                });
-                return;
+            if (error instanceof AxiosError) {
+                if (error.status === 401) {
+                    form.setError('email', {
+                        type: 'custom',
+                        message: 'Email have been used. Please use another one.',
+                    });
+                    return;
+                }
+                console.log('Send otp error', error);
             }
-            console.log('Send otp error', error);
         }
     }
 

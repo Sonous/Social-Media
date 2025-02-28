@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useAppSelector } from '@/hooks/reduxHooks';
 import { selectUser } from '@/store/slices/UserSlice';
 import supabase from '@/utils/supabase';
+import { AxiosError } from 'axios';
 import { Bookmark, Captions, Settings2 } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router';
@@ -55,10 +56,13 @@ export const Profile = () => {
                     ...profile,
                 });
             } catch (error) {
-                if (error.status === 404) {
-                    navigate('/not-found');
+                if (error instanceof AxiosError) {
+                    if (error.status === 404) {
+                        navigate('/not-found');
+                    }
+                    console.log(error);
                 }
-                console.log(error);
+                
             }
         }
 

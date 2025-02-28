@@ -9,6 +9,7 @@ import { Link, useNavigate } from 'react-router';
 import authApis from '@/apis/auth.api';
 import { useAppDispatch } from '@/hooks/reduxHooks';
 import { setUser } from '@/store/slices/UserSlice';
+import { AxiosError } from 'axios';
 // import supabase from '@/utils/supabase';
 // import google from '@/assets/googleLogo.png';
 // import github from '@/assets/githubLogo.svg';
@@ -45,17 +46,19 @@ function Login() {
             dispatch(setUser(userInfo));
             navigate('/');
         } catch (error) {
-            if(error.status === 401) {
-                form.setError('email', {
-                    type: 'manual',
-                    message: 'Invalid email or password',
-                });
-                form.setError('password', {
-                    type: 'manual',
-                    message: 'Invalid email or password',
-                });
+            if (error instanceof AxiosError) {
+                if (error.status === 401) {
+                    form.setError('email', {
+                        type: 'manual',
+                        message: 'Invalid email or password',
+                    });
+                    form.setError('password', {
+                        type: 'manual',
+                        message: 'Invalid email or password',
+                    });
+                }
+                console.log(error);
             }
-            console.log(error);
         }
     }
 

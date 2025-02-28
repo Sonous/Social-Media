@@ -18,7 +18,6 @@ export default {
       input: {
         padding: 9,
         outline: 'none',
-        overflowY: 'auto' as OverflowY,
         height: 150
       },
     },

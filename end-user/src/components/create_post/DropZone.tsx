@@ -1,6 +1,6 @@
 import { nanoid } from '@reduxjs/toolkit';
 import { ImageUp } from 'lucide-react';
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 
 function DropZone({ setMedias }: { setMedias: MediaState['setMedias']}) {

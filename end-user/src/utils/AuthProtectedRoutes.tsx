@@ -4,6 +4,7 @@ import { useAppDispatch } from '@/hooks/reduxHooks';
 import useLocalStorage from '@/hooks/useLocalStorage';
 import { setUser } from '@/store/slices/UserSlice';
 import { useQuery } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { Navigate, Outlet } from 'react-router';
 
@@ -29,11 +30,14 @@ export const ProtectedRoutes = () => {
             dispatch(setUser(data));
             setIsLogged(true);
         } else if (isError) {
-            if (error.status === 401) {
-                dropStorage();
-                setIsLogged(false);
+            if (error instanceof AxiosError) {
+                if (error.status === 401) {
+                    dropStorage();
+                    setIsLogged(false);
+                }
+                console.log(error);
             }
-            console.log(error);
+            
         }
     }, [isError, isFetching, data]);
 

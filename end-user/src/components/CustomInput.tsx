@@ -15,7 +15,7 @@ const CustomInput = ({
     setInputValue?: React.Dispatch<React.SetStateAction<string>>;
     type: 'input' | 'text';
     // onSubmit: () => void;
-    className: string;
+    className?: string;
 }) => {
     // Fetching following when user stops typing
     const queryFollowing: DataFunc = async (query, callback) => {
@@ -92,7 +92,7 @@ const CustomInput = ({
                 data={type === 'input' ? func : []}
                 renderSuggestion={renderSuggestion}
                 markup={`${symbolTrigger}[__display__](__id__)`}
-                displayTransform={(id: string, display: string) => `${symbolTrigger}${display}`}
+                displayTransform={(_, display: string) => `${symbolTrigger}${display}`}
                 style={{}}
             />
         </MentionsInput>

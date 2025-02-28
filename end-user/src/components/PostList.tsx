@@ -1,6 +1,5 @@
-import React, { useContext, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Loading } from './Loading';
-import { PostModalContext } from '@/context/PostModalProvider';
 import Post from './Post';
 import { useInView } from 'motion/react';
 

@@ -6,7 +6,7 @@ import { Brackets, Repository } from 'typeorm';
 import { RoomInterface } from './interfaces/room.interface';
 import { RoomsUsers } from 'src/entities/roomsUsers.entity';
 import { UsersService } from 'src/users/users.service';
-import { MessageInterface } from './interfaces/MessageInterface.interface';
+import { MessageInterface } from './interfaces/messageInterface.interface';
 
 @Injectable()
 export class ChatsService {

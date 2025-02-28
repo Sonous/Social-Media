@@ -152,7 +152,7 @@ const Post = ({ type, post }: { type: 'simple' | 'normal' | 'modal'; post: Post 
 
         async function fetchParentComment() {
             try {
-                const { comments, quantity, totalPage } = await commentApis.getParentComments(post.id, page);
+                const { comments, totalPage } = await commentApis.getParentComments(post.id, page);
 
                 if (totalPage > page) setShowPlusButton(true);
                 else setShowPlusButton(false);

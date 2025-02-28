@@ -51,13 +51,20 @@ const EditPost = ({
                             setContent(e.target.value);
                         }
                     }}
-                    style={defaultStyle}
+                    style={{
+                        ...defaultStyle,
+                        '&multiLine': {
+                            input: {
+                                overflowY: 'auto',
+                            }
+                        }
+                    }}
                 >
                     <Mention
                         trigger="#"
                         data={func}
                         markup="#[__display__](__id__)"
-                        displayTransform={(id: string, display: string) => `#${display}`}
+                        displayTransform={(_, display: string) => `#${display}`}
                         style={defaultMentionStyle}
                     />
                 </MentionsInput>

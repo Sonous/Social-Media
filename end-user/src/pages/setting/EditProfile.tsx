@@ -6,7 +6,7 @@ import { useAppDispatch, useAppSelector } from '@/hooks/reduxHooks';
 import { selectUser, updateUser } from '@/store/slices/UserSlice';
 import supabase from '@/utils/supabase';
 import React, { useRef, useState } from 'react';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 const EditProfile = () => {
     const user = useAppSelector(selectUser);

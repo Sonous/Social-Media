@@ -1,6 +1,5 @@
 import { useAppSelector } from '@/hooks/reduxHooks';
 import { selectUser } from '@/store/slices/UserSlice';
-import React from 'react';
 import CustomAvatar from './CustomAvatar';
 import classNames from 'classnames';
 

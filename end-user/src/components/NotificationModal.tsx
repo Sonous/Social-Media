@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-const NotificationhModal = ({
-    setShowNotificationModal,
-}: {
-    setShowNotificationModal: React.Dispatch<React.SetStateAction<boolean>>;
-}) => {
+const NotificationhModal = () => {
     const [notifications, setNotifications] = useState<Notification[]>([]);
+
+    useEffect(() => {
+        setNotifications([])
+    }, [])
 
     return (
         <div className="absolute sm:left-[100%] z-20 h-full bg-white transition-all sm:w-[400px] w-full sm:border-r-2 max-sm:bottom-[100%] max-sm:rounded-t-2xl max-sm:h-[400px] max-sm:border-t-2 max-sm:border-x-2 flex flex-col">

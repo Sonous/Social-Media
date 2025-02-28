@@ -6,7 +6,7 @@ const userApis = {
         return axiosInstance.get(`/users/validate-username?username=${username}`);
     },
 
-    addUser(user: User) {
+    addUser(user: Partial<User>) {
         return axiosInstance.post('/users', user);
     },
 
