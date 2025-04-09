@@ -13,7 +13,6 @@ import {
 } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UsersService } from './users.service';
-import { JwtGuard } from 'src/auth/auth.guard';
 import { CreateRelationDto } from './dtos/create-relation.dto';
 
 @Controller('users')
@@ -39,7 +38,6 @@ export class UsersController {
         return await this.usersService.validateUsername(username);
     }
 
-    @UseGuards(JwtGuard)
     @Get('user-token')
     async getUserByToken(@Request() req: Request & { user: { id: string; email: string } }) {
         return {

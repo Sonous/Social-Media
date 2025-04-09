@@ -1,3 +1,4 @@
+import cloudinaryAPI from '@/apis/cloudinary.api';
 import roomApis from '@/apis/room.api';
 import userApis from '@/apis/users.api';
 import { Loading } from '@/components/Loading';
@@ -6,7 +7,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useAppSelector } from '@/hooks/reduxHooks';
 import { selectUser } from '@/store/slices/UserSlice';
-import supabase from '@/utils/supabase';
 import { AxiosError } from 'axios';
 import { Bookmark, Captions, Settings2 } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
@@ -46,7 +46,6 @@ export const Profile = () => {
             try {
                 if (state === 'other') {
                     const { data } = await userApis.getUserByUsername(username);
-                    console.log(data);
 
                     profile = { ...data };
                     await checkRelation(user.id, data.id);
@@ -83,19 +82,13 @@ export const Profile = () => {
         const avatar = event.target.files[0];
 
         try {
-            const { data } = await supabase.storage.from('avatars').upload(`/${user.id}/${avatar.name}`, avatar, {
-                upsert: true,
-            });
+            const imageUrl = await cloudinaryAPI.uploadImage(user.id, 'avatars', avatar)
 
-            if (data) {
-                const {
-                    data: { publicUrl },
-                } = supabase.storage.from('avatars').getPublicUrl(data?.path);
-
+            if (imageUrl) {
                 await userApis.updateUser(user.id, {
-                    avatar_url: publicUrl,
+                    avatar_url: imageUrl,
                 });
-                user.avatar_url = publicUrl;
+                user.avatar_url = imageUrl;
             }
         } catch (error) {
             console.log(error);

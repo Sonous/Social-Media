@@ -1,10 +1,10 @@
+import cloudinaryAPI from '@/apis/cloudinary.api';
 import userApis from '@/apis/users.api';
 import CustomAvatar from '@/components/CustomAvatar';
 import { Loading } from '@/components/Loading';
 import { Button } from '@/components/ui/button';
 import { useAppDispatch, useAppSelector } from '@/hooks/reduxHooks';
 import { selectUser, updateUser } from '@/store/slices/UserSlice';
-import supabase from '@/utils/supabase';
 import React, { useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 
@@ -20,21 +20,15 @@ const EditProfile = () => {
         const avatar = event.target.files[0];
 
         try {
-            const { data } = await supabase.storage.from('avatars').upload(`/${user.id}/${avatar.name}`, avatar, {
-                upsert: true,
-            });
+            const imageUrl = await cloudinaryAPI.uploadImage(user.id, 'avatars', avatar)
 
-            if (data) {
-                const {
-                    data: { publicUrl },
-                } = supabase.storage.from('avatars').getPublicUrl(data?.path);
-
+            if (imageUrl) {
                 await userApis.updateUser(user.id, {
-                    avatar_url: publicUrl,
+                    avatar_url: imageUrl,
                 });
                 dispatch(
                     updateUser({
-                        avatar_url: publicUrl,
+                        avatar_url: imageUrl,
                     }),
                 );
             }

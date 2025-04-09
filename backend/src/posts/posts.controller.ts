@@ -1,14 +1,12 @@
 import { BadRequestException, Body, Controller, Delete, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dtos/create-post.dto';
-import { JwtGuard } from 'src/auth/auth.guard';
 import { CreateInteractionDto } from './dtos/create-interaction.dto';
 
 @Controller('posts')
 export class PostsController {
     constructor(private postsService: PostsService) {}
 
-    @UseGuards(JwtGuard)
     @Post()
     async addPost(@Body() post: CreatePostDto) {
         return await this.postsService.addPost(post);

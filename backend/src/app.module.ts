@@ -20,6 +20,7 @@ import { ChatsModule } from './chats/chats.module';
 import { Rooms } from './entities/room.entity';
 import { Messages } from './entities/message.entity';
 import { RoomsUsers } from './entities/roomsUsers.entity';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 @Module({
     imports: [
@@ -40,6 +41,7 @@ import { RoomsUsers } from './entities/roomsUsers.entity';
         SavedModule,
         CommentsModule,
         ChatsModule,
+        CloudinaryModule,
     ],
     controllers: [AppController],
     providers: [

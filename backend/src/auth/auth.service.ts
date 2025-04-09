@@ -48,7 +48,7 @@ export class AuthService {
         return await bcrypt.compare(password, hashedPassword);
     }
 
-    async login(email: string, password: string): Promise<{ access_token: string }> {
+    async login(email: string, password: string): Promise<{ accessToken: string; refreshToken: string }> {
         const user = await this.usersRepository
             .createQueryBuilder('user')
             .where('user.email = :email', { email })
@@ -64,13 +64,64 @@ export class AuthService {
             throw new UnauthorizedException('Incorrect password');
         }
 
-        const payload = { id: user.id, email: user.email };
+        // Generate access and refresh tokens
+        delete user.password; // Remove password from user object
+
+        const payload = {
+            user: {
+                ...user,
+            },
+        };
+        const accessToken = await this.jwtService.signAsync(
+            {
+                ...payload,
+                tokenType: 'accessToken',
+            },
+            {
+                expiresIn: '1m',
+            },
+        );
+        const refreshToken = await this.jwtService.signAsync(
+            {
+                ...payload,
+                tokenType: 'refreshToken',
+            },
+            {
+                expiresIn: '7d',
+            },
+        );
 
         return {
-            access_token: await this.jwtService.signAsync(payload, {
-                expiresIn: '2h',
-            }),
+            accessToken,
+            refreshToken,
         };
+    }
+
+    async verifyRefreshToken(token: string) {
+        const payload: TokenPayload = await this.jwtService.verifyAsync(token);
+
+        if (payload.tokenType !== 'refreshToken') {
+            throw new UnauthorizedException('Invalid token type! Expected refresh token');
+        }
+
+        const user = await this.usersRepository.findOneBy({ id: payload.user.id });
+
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+        delete user.password; // Remove password from user object
+
+        const accessToken = await this.jwtService.signAsync(
+            {
+                user: { ...user },
+                tokenType: 'accessToken',
+            },
+            {
+                expiresIn: '1m',
+            },
+        );
+
+        return accessToken;
     }
 
     async signUp(email: string) {

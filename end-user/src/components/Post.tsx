@@ -55,7 +55,6 @@ const Post = ({ type, post }: { type: 'simple' | 'normal' | 'modal'; post: Post 
 
     const handleCloseModal = (event: React.MouseEvent) => {
         if (postRef.current && !postRef.current.contains(event.target as Node)) {
-            console.log();
             setIsOpenPostModal(false);
         }
     };

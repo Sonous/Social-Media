@@ -52,7 +52,6 @@ function Signup() {
     // Sign up
     async function handleSignup(values: z.infer<typeof formSchema>) {
         try {
-            // TODO: Add loading effect
             const newUser = {
                 name: values.fullname,
                 username: values.username,
@@ -76,7 +75,6 @@ function Signup() {
             const isValid = await form.trigger('email');
 
             if (isValid) {
-                // TODO: Add loading effect
                 await authApis.sendOpt(form.getValues('email'));
                 setDisabledInputs((prev) => [...prev.filter((item) => item !== 'otp'), 'email']);
                 setShowTimer(true);
@@ -158,7 +156,6 @@ function Signup() {
                         message: 'Username is taken. Please choose another one.',
                     });
                 } else {
-                    //TODO: process sign up action
                     toast({
                         title: 'Success',
                         description: 'Username is valid',

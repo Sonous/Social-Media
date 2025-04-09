@@ -14,11 +14,11 @@ import {
 import { Button } from '../ui/button';
 import MediasCollection from './MediasCollection';
 import EditPost from './edit_post/EditPost';
-import supabase from '@/utils/supabase';
 import { useAppSelector } from '@/hooks/reduxHooks';
 import { selectUser } from '@/store/slices/UserSlice';
 import postApis from '@/apis/posts.api';
 import { Loading } from '../Loading';
+import cloudinaryAPI from '@/apis/cloudinary.api';
 
 type DialogState = 'selectMedia' | 'editPost';
 
@@ -70,40 +70,20 @@ const CreateDialog = ({
     };
 
     // console.log(user)
-
-    // TODO: handle send post to supabase and backend
     const handleSendPost = async () => {
         try {
             setIsLoading(true);
 
             const uploadPromises = medias.map(async (media) => {
-                const { data } = await supabase.storage
-                    .from('post_medias')
-                    .upload(`/${user.id}/${media.file.name}`, media.file, {
-                        upsert: true,
-                    });
+                const url = await cloudinaryAPI.uploadImage(user.id, 'posts', media.file);
 
                 return {
                     type: media.file.type.split('/')[0],
-                    data,
+                    url,
                 };
             });
-            const uploadResults = await Promise.all(uploadPromises);
+            const urlResults = await Promise.all(uploadPromises) as MediaType[];
 
-            const urlResults = uploadResults.map((result) => {
-                if (result.data) {
-                    const {
-                        data: { publicUrl },
-                    } = supabase.storage.from('post_medias').getPublicUrl(result.data.path);
-
-                    return {
-                        type: result.type,
-                        url: publicUrl,
-                    };
-                }
-            }) as MediaType[];
-
-            // TODO: pass object media following pattern: { type: string, url: string }
             // console.log(uploadResults);
             // console.log(urlResults);
             // console.log(medias);

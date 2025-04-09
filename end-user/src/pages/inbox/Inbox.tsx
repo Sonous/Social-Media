@@ -71,8 +71,6 @@ export const Inbox = () => {
         }
     }, [searchInput])
 
-    console.log('rooms', rooms);
-
     return (
         <div className="flex-center m-7 flex-col">
             <div className="w-full max-w-[500px] space-y-5">

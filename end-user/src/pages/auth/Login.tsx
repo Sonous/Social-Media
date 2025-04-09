@@ -10,10 +10,8 @@ import authApis from '@/apis/auth.api';
 import { useAppDispatch } from '@/hooks/reduxHooks';
 import { setUser } from '@/store/slices/UserSlice';
 import { AxiosError } from 'axios';
-// import supabase from '@/utils/supabase';
 // import google from '@/assets/googleLogo.png';
 // import github from '@/assets/githubLogo.svg';
-// import useLocalStorage from '@/hooks/useLocalStorage';
 
 const formSchema = z.object({
     email: z.string().min(1, { message: 'Email is required.' }).email({ message: 'Invalid email address' }),
@@ -42,7 +40,6 @@ function Login() {
         try {
             const userInfo = await authApis.login(values.email, values.password);
 
-            console.log(userInfo);
             dispatch(setUser(userInfo));
             navigate('/');
         } catch (error) {
@@ -61,20 +58,6 @@ function Login() {
             }
         }
     }
-
-    // async function handleLoginWithGithub() {
-    //     const {  error } = await supabase.auth.signInWithOAuth({
-    //         provider: 'github',
-    //         options: {
-    //             redirectTo: `http://localhost:5173/login`,
-    //         },
-    //     });
-
-    //     if (!error) {
-    //         setItem('isLogged', true)
-    //         setItem('access_token', '')
-    //     }
-    // }
 
     return (
         <div className="flex-center min-h-svh">

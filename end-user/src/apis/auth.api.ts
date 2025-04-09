@@ -12,7 +12,7 @@ const authApis = {
     },
 
     async login(email: string, password: string) {
-        const { data: { access_token } } = await axiosInstance.post<{ access_token: string }>('/auth/login', { email, password });
+        const { data: { accessToken: access_token } } = await axiosInstance.post<{ accessToken: string }>('/auth/login', { email, password });
 
         const user = await userApis.getUserByToken(access_token)
 

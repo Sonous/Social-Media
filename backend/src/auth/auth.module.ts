@@ -7,6 +7,8 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { ConfigService } from '@nestjs/config';
 import { UsersModule } from 'src/users/users.module';
 import { JwtModule } from '@nestjs/jwt';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from './auth.guard';
 
 @Module({
     imports: [
@@ -23,7 +25,7 @@ import { JwtModule } from '@nestjs/jwt';
             useFactory: async (config: ConfigService) => ({
                 transport: {
                     host: config.get('EMAIL_HOST'),
-                    port: 25,
+                    port: config.get('EMAIL_PORT'),
                     secure: false,
                     auth: {
                         user: config.get('EMAIL_USER'),
@@ -45,6 +47,12 @@ import { JwtModule } from '@nestjs/jwt';
     ],
     exports: [AuthService, JwtModule],
     controllers: [AuthController],
-    providers: [AuthService],
+    providers: [
+        AuthService,
+        {
+            provide: APP_GUARD,
+            useClass: AuthGuard,
+        },
+    ],
 })
 export class AuthModule {}

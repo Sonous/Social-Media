@@ -61,7 +61,6 @@ function Reset() {
             const isValid = await form.trigger('email');
 
             if (isValid) {
-                // TODO: Add loading effect
                 const { data} = await authApis.reset(form.getValues('email'));
                 setDisabledInputs((prev) => [...prev.filter((item) => item !== 'otp'), 'email']);
                 setShowTimer(true)
@@ -102,7 +101,6 @@ function Reset() {
 
                 if (data.isValid) {
                     setDisabledInputs(prev => [...prev.filter(item => item !== 'info'), 'otp', 'getOtp'])
-                    // TODO: add toast success
                 } else {
                     form.setError('otp', {
                         type: 'custom',

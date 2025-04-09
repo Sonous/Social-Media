@@ -176,6 +176,7 @@ function MainLayout() {
                                 />
                             </div>
 
+                             {/* TODO: Sử dụng shadcn component menu cho cái này */}
                             <div className="relative max-sm:hidden">
                                 <div
                                     ref={scope}

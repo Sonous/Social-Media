@@ -17,7 +17,6 @@ const Posts = () => {
 
         async function fetchPosts() {
             try {
-                // TODO: optimize fetching data
                 const {
                     data: { posts, totalPage },
                 } = await postApis.getPostsByUserId(profile.id, currentPage);
@@ -41,7 +40,6 @@ const Posts = () => {
         }
     }, [profile, isVisible]);
 
-    console.log(posts)
 
     return <PostList posts={posts} isFetching={isFetching} setIsVisible={setIsVisible} />;
 };
