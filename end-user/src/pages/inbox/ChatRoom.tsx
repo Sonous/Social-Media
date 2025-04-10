@@ -2,8 +2,7 @@ import roomApis from '@/apis/room.api';
 import CustomAvatar from '@/components/CustomAvatar';
 import CustomInput from '@/components/CustomInput';
 import Message from '@/components/Message';
-import { useAppSelector } from '@/hooks/reduxHooks';
-import { selectUser } from '@/store/slices/UserSlice';
+import useTokenStore from '@/store/useTokenStore';
 import { uniqueArr } from '@/utils/uniqueArr';
 import { useEffect, useRef, useState } from 'react';
 import {  useParams } from 'react-router';
@@ -13,7 +12,7 @@ const ChatRoom = () => {
     const { roomId } = useParams();
     const [room, setRoom] = useState<Room | undefined>();
     const [messages, setMessages] = useState<Message[]>([]);
-    const user = useAppSelector(selectUser);
+    const user = useTokenStore(state => state.user as User);
     const [messageInput, setMessageInput] = useState('');
     const [socket, setSocket] = useState<Socket>();
     const divRef = useRef<HTMLDivElement | null>(null);

@@ -7,9 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Link, useNavigate } from 'react-router';
 import authApis from '@/apis/auth.api';
-import { useAppDispatch } from '@/hooks/reduxHooks';
-import { setUser } from '@/store/slices/UserSlice';
 import { AxiosError } from 'axios';
+import useTokenStore from '@/store/useTokenStore';
 // import google from '@/assets/googleLogo.png';
 // import github from '@/assets/githubLogo.svg';
 
@@ -25,7 +24,7 @@ const formSchema = z.object({
 });
 
 function Login() {
-    const dispatch = useAppDispatch();
+    const { setToken } = useTokenStore();
     const navigate = useNavigate();
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -38,9 +37,9 @@ function Login() {
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         try {
-            const userInfo = await authApis.login(values.email, values.password);
+            const accessToken = await authApis.login(values.email, values.password);
 
-            dispatch(setUser(userInfo));
+            setToken(accessToken);
             navigate('/');
         } catch (error) {
             if (error instanceof AxiosError) {

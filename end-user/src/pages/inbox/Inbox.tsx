@@ -2,15 +2,14 @@ import roomApis from '@/apis/room.api';
 import RoomCard from '@/components/RoomCard';
 import Search from '@/components/Search';
 import { PostModalContext } from '@/context/PostModalProvider';
-import { useAppSelector } from '@/hooks/reduxHooks';
 import useDebounce from '@/hooks/useDebounce';
-import { selectUser } from '@/store/slices/UserSlice';
+import useTokenStore from '@/store/useTokenStore';
 import { SquarePen } from 'lucide-react';
 import { useContext, useEffect, useState } from 'react';
 
 export const Inbox = () => {
     const [rooms, setRooms] = useState<Room[]>([]);
-    const user = useAppSelector(selectUser);
+    const user = useTokenStore(state => state.user as User);
     const [searchedString, setSearchedString] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const { setIsShowNavText } = useContext(PostModalContext);

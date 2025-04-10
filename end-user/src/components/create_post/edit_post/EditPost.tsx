@@ -1,5 +1,3 @@
-import { useAppSelector } from '@/hooks/reduxHooks';
-import { selectUser } from '@/store/slices/UserSlice';
 import React, { useCallback } from 'react';
 import { MentionsInput, Mention, DataFunc } from 'react-mentions';
 import defaultStyle from './defaultStyle';
@@ -7,6 +5,7 @@ import defaultMentionStyle from './defaultMentionStyle';
 import hashtagApis from '@/apis/hashtag.api';
 import { debounce } from '@/utils/debounce';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import useTokenStore from '@/store/useTokenStore';
 
 const EditPost = ({
     content,
@@ -15,7 +14,7 @@ const EditPost = ({
     content: string;
     setContent: React.Dispatch<React.SetStateAction<string>>;
 }) => {
-    const user = useAppSelector(selectUser);
+    const user = useTokenStore(state => state.user as User);
 
     // Fetching hashtags when user stops typing
     const queryHashtag: DataFunc = async (query, callback) => {

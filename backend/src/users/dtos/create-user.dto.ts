@@ -18,8 +18,10 @@ export class CreateUserDto {
     password: string;
 
     @IsString()
+    @IsOptional()
     avatar_url: string;
 
     @IsString()
+    @IsOptional()
     bio: string;
 }

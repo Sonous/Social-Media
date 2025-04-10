@@ -1,4 +1,4 @@
-import { nanoid } from '@reduxjs/toolkit';
+import { nanoid } from 'nanoid'
 import { CirclePlus, CircleX } from 'lucide-react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { SlotItemMapArray, Swapy, utils, createSwapy } from 'swapy';

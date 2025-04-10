@@ -19,7 +19,6 @@ import { AuthGuard } from './auth.guard';
                 global: true,
             }),
         }),
-        forwardRef(() => UsersModule),
         MailerModule.forRootAsync({
             inject: [ConfigService],
             useFactory: async (config: ConfigService) => ({
@@ -44,8 +43,9 @@ import { AuthGuard } from './auth.guard';
                 },
             }),
         }),
+        forwardRef(() => UsersModule),
     ],
-    exports: [AuthService, JwtModule],
+    exports: [AuthService],
     controllers: [AuthController],
     providers: [
         AuthService,

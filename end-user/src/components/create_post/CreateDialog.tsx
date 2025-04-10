@@ -14,11 +14,10 @@ import {
 import { Button } from '../ui/button';
 import MediasCollection from './MediasCollection';
 import EditPost from './edit_post/EditPost';
-import { useAppSelector } from '@/hooks/reduxHooks';
-import { selectUser } from '@/store/slices/UserSlice';
 import postApis from '@/apis/posts.api';
 import { Loading } from '../Loading';
 import cloudinaryAPI from '@/apis/cloudinary.api';
+import useTokenStore from '@/store/useTokenStore';
 
 type DialogState = 'selectMedia' | 'editPost';
 
@@ -42,7 +41,7 @@ const CreateDialog = ({
     const [showDiscardDialog, setShowDiscardDialog] = useState(false);
     const [dialogState, setDialogState] = useState(initialDialogState);
     const [content, setContent] = useState('');
-    const user = useAppSelector(selectUser);
+    const user = useTokenStore(state => state.user as User);
     const [isLoading, setIsLoading] = useState(false);
 
     const handleHideDialog = (event: React.MouseEvent) => {

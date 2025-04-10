@@ -33,7 +33,7 @@ const formSchema = z.object({
 });
 
 function Signup() {
-    const [disabledInputs, setDisabledInputs] = useState(['otp', 'info']);
+    const [disabledInputs, setDisabledInputs] = useState(['otp']);
     const [isMounted, setIsMounted] = useState(false);
     const [showTimer, setShowTimer] = useState(false);
     const navigate = useNavigate();
@@ -49,33 +49,13 @@ function Signup() {
         },
     });
 
-    // Sign up
-    async function handleSignup(values: z.infer<typeof formSchema>) {
-        try {
-            const newUser = {
-                name: values.fullname,
-                username: values.username,
-                email: values.email,
-                password: values.password,
-                avatar_url: '',
-                bio: '',
-            };
-
-            await userApis.addUser(newUser);
-
-            navigate('/login');
-        } catch (error) {
-            console.log('Signup error', error);
-        }
-    }
-
     // Send otp email
     async function handleSendOTP() {
         try {
             const isValid = await form.trigger('email');
 
             if (isValid) {
-                await authApis.sendOpt(form.getValues('email'));
+                await authApis.sendOpt(form.getValues('email'), false);
                 setDisabledInputs((prev) => [...prev.filter((item) => item !== 'otp'), 'email']);
                 setShowTimer(true);
             }
@@ -92,43 +72,6 @@ function Signup() {
             }
         }
     }
-
-    // Check otp
-    const otpDebounce = useDebounce(form.watch('otp'), 500);
-
-    useEffect(() => {
-        if (isMounted) {
-            checkOtp();
-        } else setIsMounted(true);
-
-        async function checkOtp() {
-            const isValid = await form.trigger('otp');
-
-            if (!isValid) {
-                console.log('otp invalid');
-                return;
-            }
-
-            try {
-                const { data } = await authApis.checkOtp(otpDebounce);
-
-                if (data.isValid) {
-                    setDisabledInputs((prev) => [...prev.filter((item) => item !== 'info'), 'otp', 'getOtp']);
-                    toast({
-                        title: 'Success',
-                        description: 'OTP is valid',
-                    });
-                } else {
-                    form.setError('otp', {
-                        type: 'custom',
-                        message: 'Invalid OTP',
-                    });
-                }
-            } catch (error) {
-                console.log('error check otp', error);
-            }
-        }
-    }, [otpDebounce]);
 
     // check username
     const usernameDebouce = useDebounce(form.watch('username'), 500).toLowerCase();
@@ -166,6 +109,29 @@ function Signup() {
             }
         }
     }, [usernameDebouce]);
+
+    // Sign up
+    async function handleSignup(values: z.infer<typeof formSchema>) {
+        try {
+            const newUser = {
+                name: values.fullname,
+                username: values.username,
+                email: values.email,
+                password: values.password,
+            };
+
+            await authApis.signup(newUser, values.otp);
+            navigate('/login');
+        } catch (error) {
+            console.log('Signup error', error);
+            toast({
+                title: 'Error',
+                description: error instanceof AxiosError 
+                    ? error.response?.data?.message || 'Something went wrong. Please try again.'
+                    : 'Something went wrong. Please try again.',
+            });
+        }
+    }
 
     return (
         <div className="flex-center min-h-svh">
@@ -230,7 +196,7 @@ function Signup() {
                             <FormField
                                 control={form.control}
                                 name="fullname"
-                                disabled={disabledInputs.includes('info')}
+                                disabled={disabledInputs.includes('otp')}
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Full Name</FormLabel>
@@ -245,7 +211,7 @@ function Signup() {
                             <FormField
                                 control={form.control}
                                 name="password"
-                                disabled={disabledInputs.includes('info')}
+                                disabled={disabledInputs.includes('otp')}
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Password</FormLabel>
@@ -260,7 +226,7 @@ function Signup() {
                             <FormField
                                 control={form.control}
                                 name="username"
-                                disabled={disabledInputs.includes('info')}
+                                disabled={disabledInputs.includes('otp')}
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Username</FormLabel>
@@ -276,11 +242,13 @@ function Signup() {
                         <Button
                             type="button"
                             className="w-full bg-picton_blue hover:bg-blue_(ncs)"
+                            disabled={disabledInputs.includes('otp')}
                             onClick={async () => {
                                 const { invalid: usernameInvalid } = form.getFieldState('username');
                                 const { invalid: emailInvalid } = form.getFieldState('email');
 
                                 if (!usernameInvalid && !emailInvalid) {
+                                    console.log('jfkasdjflk');
                                     const isFormValid = await form.trigger();
 
                                     if (isFormValid) {

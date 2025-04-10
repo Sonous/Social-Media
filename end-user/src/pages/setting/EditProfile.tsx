@@ -3,34 +3,30 @@ import userApis from '@/apis/users.api';
 import CustomAvatar from '@/components/CustomAvatar';
 import { Loading } from '@/components/Loading';
 import { Button } from '@/components/ui/button';
-import { useAppDispatch, useAppSelector } from '@/hooks/reduxHooks';
-import { selectUser, updateUser } from '@/store/slices/UserSlice';
+import useTokenStore from '@/store/useTokenStore';
 import React, { useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 
 const EditProfile = () => {
-    const user = useAppSelector(selectUser);
-    const dispatch = useAppDispatch();
+    const { updateUser, user } = useTokenStore();
     const inputRef = useRef<HTMLInputElement | null>(null);
     const [bio, setBio] = useState('');
-    const [isLoading, setIsLoading] = useState(false)
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleUploadPhoto = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (!event.target.files) return;
+        if (!event.target.files || !user) return;
         const avatar = event.target.files[0];
 
         try {
-            const imageUrl = await cloudinaryAPI.uploadImage(user.id, 'avatars', avatar)
+            const imageUrl = await cloudinaryAPI.uploadImage(user.id, 'avatars', avatar);
 
             if (imageUrl) {
                 await userApis.updateUser(user.id, {
                     avatar_url: imageUrl,
                 });
-                dispatch(
-                    updateUser({
-                        avatar_url: imageUrl,
-                    }),
-                );
+                updateUser({
+                    avatar_url: imageUrl,
+                });
             }
         } catch (error) {
             console.log(error);
@@ -38,26 +34,26 @@ const EditProfile = () => {
     };
 
     const handleUpdateUser = async () => {
+        if (!user) return;
+
         try {
-            setIsLoading(true)
+            setIsLoading(true);
             await userApis.updateUser(user.id, {
-                bio
-            })
+                bio,
+            });
 
-            dispatch(
-                updateUser({
-                    bio
-                }),
-            );
+            updateUser({
+                bio,
+            });
 
-            toast('Update success!')
-            setBio('')
+            toast('Update success!');
+            setBio('');
         } catch (error) {
-            console.log(error)
+            console.log(error);
         } finally {
-            setIsLoading(false)
+            setIsLoading(false);
         }
-    }
+    };
 
     return (
         <div className="flex justify-center flex-1">
@@ -65,11 +61,15 @@ const EditProfile = () => {
                 <h1 className="text-lg font-semibold">Edit Profile</h1>
 
                 <div className="flex items-center flex-wrap gap-5 bg-[#e4e4e4] rounded-xl p-3">
-                    <CustomAvatar avatar_url={user.avatar_url} username={user.username} />
-                    <div className="flex flex-col justify-center flex-1">
-                        <h1 className="text-lg font-semibold">{user.username}</h1>
-                        <h1 className="text-[#898989] text-sm">{user.name}</h1>
-                    </div>
+                    {user && (
+                        <>
+                            <CustomAvatar avatar_url={user.avatar_url} username={user.username} />
+                            <div className="flex flex-col justify-center flex-1">
+                                <h1 className="text-lg font-semibold">{user.username}</h1>
+                                <h1 className="text-[#898989] text-sm">{user.name}</h1>
+                            </div>
+                        </>
+                    )}
                     <Button
                         className="bg-blue-500 hover:bg-blue-600"
                         onClick={() => {
@@ -96,11 +96,11 @@ const EditProfile = () => {
                     <p className="absolute right-3 bottom-3 text-sm text-[#898989]">{bio.length} / 150</p>
                 </div>
 
-                <Button className='bg-blue-500 hover:bg-blue-600' onClick={handleUpdateUser}>
+                <Button className="bg-blue-500 hover:bg-blue-600" onClick={handleUpdateUser}>
                     Submit
                 </Button>
             </div>
-            {isLoading && <Loading state='full' />}
+            {isLoading && <Loading state="full" />}
         </div>
     );
 };

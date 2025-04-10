@@ -21,18 +21,27 @@ import { Rooms } from './entities/room.entity';
 import { Messages } from './entities/message.entity';
 import { RoomsUsers } from './entities/roomsUsers.entity';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { parse } from 'pg-connection-string';
 
 @Module({
     imports: [
         ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
-        TypeOrmModule.forRoot({
-            type: 'mysql',
-            host: process.env.DB_HOST,
-            port: parseInt(process.env.DB_PORT),
-            username: process.env.DB_USERNAME,
-            password: process.env.DB_PASSWORD,
-            database: process.env.DB_NAME,
-            entities: [Users, Time, Posts, Hashtags, Saved, Comments, Rooms, Messages, RoomsUsers],
+        TypeOrmModule.forRootAsync({
+            useFactory() {
+                const dbUrl = process.env.DATABASE_URL || '';
+                const config = parse(dbUrl);
+
+                return {
+                    type: 'postgres',
+                    host: config.host,
+                    port: parseInt(config.port || '5432', 10),
+                    username: config.user,
+                    password: config.password,
+                    database: config.database,
+                    ssl: { rejectUnauthorized: false },
+                    entities: [Users, Time, Posts, Hashtags, Saved, Comments, Rooms, Messages, RoomsUsers],
+                };
+            },
         }),
         AuthModule,
         UsersModule,

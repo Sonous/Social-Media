@@ -3,14 +3,13 @@ import { AlignJustify, Bell, Bookmark, House, Search, Send, Settings2, SquarePlu
 import NavItem from '@/components/NavItem';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { useAnimate } from 'motion/react';
-import { useAppDispatch, useAppSelector } from '@/hooks/reduxHooks';
-import { clearUser, selectUser } from '@/store/slices/UserSlice';
 import CreateDialog from '@/components/create_post/CreateDialog';
 import { PostModalContext } from '@/context/PostModalProvider';
 import Post from '@/components/Post';
 import CustomAvatar from '@/components/CustomAvatar';
 import SearchModal from '@/components/SearchModal';
 import NotificationModal from '@/components/NotificationModal';
+import useTokenStore from '@/store/useTokenStore';
 
 const initNavItem: NavItem[] = [
     {
@@ -49,8 +48,8 @@ function MainLayout() {
     const [showCreateDialog, setShowCreateDialog] = useState(false);
     const moreRef = useRef<HTMLButtonElement | null>(null);
     const [scope, animate] = useAnimate<HTMLDivElement>();
-    const user = useAppSelector(selectUser);
-    const dispatch = useAppDispatch();
+    const user = useTokenStore((state) => state.user);
+    const { clearToken } = useTokenStore();
     const { isOpenPostModal, post, setIsShowNavText } = useContext(PostModalContext);
     const [showSearchModal, setShowSearchModal] = useState(false);
     const [showNotificationModal, setShowNotificationModal] = useState(false);
@@ -164,19 +163,23 @@ function MainLayout() {
                                         onClick={() => handleNavItem(navItem)}
                                     />
                                 ))}
-                                <NavItem
-                                    iconElement={<CustomAvatar avatar_url={user.avatar_url} username={user.username} />}
-                                    label={'Profile'}
-                                    isActive={location.pathname.includes(user.username)}
-                                    onClick={() => {
-                                        setIsShowNavText(true);
-                                        setShowSearchModal(false);
-                                        navigate(`/${user.username}`);
-                                    }}
-                                />
+                                {user && (
+                                    <NavItem
+                                        iconElement={
+                                            <CustomAvatar avatar_url={user.avatar_url} username={user.username} />
+                                        }
+                                        label={'Profile'}
+                                        isActive={location.pathname.includes(user.username)}
+                                        onClick={() => {
+                                            setIsShowNavText(true);
+                                            setShowSearchModal(false);
+                                            navigate(`/${user.username}`);
+                                        }}
+                                    />
+                                )}
                             </div>
 
-                             {/* TODO: Sử dụng shadcn component menu cho cái này */}
+                            {/* TODO: Sử dụng shadcn component menu cho cái này */}
                             <div className="relative max-sm:hidden">
                                 <div
                                     ref={scope}
@@ -191,8 +194,7 @@ function MainLayout() {
                                     <div className="w-full h-[1px] bg-[#b6b6b6]"></div>
                                     <button
                                         onClick={() => {
-                                            dispatch(clearUser());
-                                            localStorage.removeItem('auth_info');
+                                            clearToken();
                                             navigate('/login');
                                         }}
                                     >

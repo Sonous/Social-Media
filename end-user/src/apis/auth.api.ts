@@ -1,31 +1,47 @@
 import axiosInstance from '@/configs/axios.config';
-import { AxiosResponse } from 'axios';
-import userApis from './users.api';
 
 const authApis = {
-    sendOpt(email: string) {
-        return axiosInstance.get(`/auth/signup?email=${email}`);
+    sendOpt(email: string, isReset: boolean) {
+        return axiosInstance.get(`/auth/send-otp`, {
+            params: {
+                email,
+                isReset,
+            },
+        });
     },
 
-    checkOtp(otp: string): Promise<AxiosResponse<{ isValid: boolean }>> {
-        return axiosInstance.get(`/auth/verify-otp?otp=${otp}`);
+    // checkOtp(otp: string): Promise<AxiosResponse<{ isValid: boolean }>> {
+    //     return axiosInstance.get(`/auth/verify-otp?otp=${otp}`);
+    // },
+    async signup(user: Partial<User>, otp: string) {
+        await axiosInstance.post('/auth/signup', { user, otp });
     },
 
     async login(email: string, password: string) {
-        const { data: { accessToken: access_token } } = await axiosInstance.post<{ accessToken: string }>('/auth/login', { email, password });
+        const {
+            data: { accessToken },
+        } = await axiosInstance.post<{ accessToken: string }>('/auth/login', { email, password });
 
-        const user = await userApis.getUserByToken(access_token)
-
-        localStorage.setItem('auth_info', JSON.stringify({
-            access_token,
-            isLogged: true,
-        }));
-        return user
+        return accessToken;
     },
 
-    reset(email: string) {
-        return axiosInstance.get(`/auth/reset?email=${email}`);
-    }
+    async reset(email: string, otp: string, password: string) {
+        return await axiosInstance.post(`/auth/reset`, {
+            email,
+            otp,
+            password,
+        });
+    },
+
+    async refreshToken() {
+        const {
+            data: { accessToken },
+        } = await axiosInstance.get<{ accessToken: string }>('/auth/refresh-token', {
+            withCredentials: true,
+        });
+
+        return accessToken;
+    },
 };
 
 export default authApis;

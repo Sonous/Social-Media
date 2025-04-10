@@ -4,10 +4,9 @@ import CustomInput from './CustomInput';
 import { formatDate } from '@/utils/formatDate';
 import { Ellipsis, Heart } from 'lucide-react';
 import commentApis from '@/apis/comment.api';
-import { useAppSelector } from '@/hooks/reduxHooks';
-import { selectUser } from '@/store/slices/UserSlice';
 import _ from 'lodash';
 import { useNavigate } from 'react-router';
+import useTokenStore from '@/store/useTokenStore';
 
 const Comment = ({
     comment,
@@ -36,7 +35,7 @@ const Comment = ({
     const [page, setPage] = useState(1);
     const [open, setOpen] = useState(false);
     const deleteRef = useRef<HTMLDivElement | null>(null);
-    const user = useAppSelector(selectUser);
+    const user = useTokenStore(state => state.user as User);
     const navigate = useNavigate();
 
     const handleCloseModal = (event: React.MouseEvent) => {

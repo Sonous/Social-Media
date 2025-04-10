@@ -1,5 +1,5 @@
 import { Lock } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -10,11 +10,9 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import authApis from '@/apis/auth.api';
-import useDebounce from '@/hooks/useDebounce';
 import Timer from '@/components/Timer';
-import userApis from '@/apis/users.api';
 import { AxiosError } from 'axios';
-
+import { toast } from '@/hooks/use-toast';
 
 const formSchema = z.object({
     email: z.string().min(1, { message: 'Email is required.' }).email({ message: 'Invalid email address' }),
@@ -32,11 +30,9 @@ function Reset() {
     // const [email, setEmail] = useState('')
     // const [otp, setOtp] = useState('')
     // const [password, setPassword] = useState('')
-    const [disabledInputs, setDisabledInputs] = useState(['otp', 'info']);
-    const [isMounted, setIsMounted] = useState(false);
+    const [disabledInputs, setDisabledInputs] = useState(['otp']);
     const [showTimer, setShowTimer] = useState(false);
-    const [userId, setUserId] = useState('')
-    const navigate = useNavigate()
+    const navigate = useNavigate();
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -48,10 +44,18 @@ function Reset() {
 
     const handleResetAccount = async (values: z.infer<typeof formSchema>) => {
         try {
-            await userApis.updateUser(userId, { password: values.password })
-            navigate('/login')
+            await authApis.reset(values.email, values.otp, values.password);
+
+            navigate('/login');
         } catch (error) {
             console.log('Reset account error', error);
+            toast({
+                title: 'Error',
+                description:
+                    error instanceof AxiosError
+                        ? error.response?.data?.message || 'Something went wrong. Please try again.'
+                        : 'Something went wrong. Please try again.',
+            });
         }
     };
 
@@ -61,57 +65,23 @@ function Reset() {
             const isValid = await form.trigger('email');
 
             if (isValid) {
-                const { data} = await authApis.reset(form.getValues('email'));
+                await authApis.sendOpt(form.getValues('email'), true);
                 setDisabledInputs((prev) => [...prev.filter((item) => item !== 'otp'), 'email']);
-                setShowTimer(true)
-                setUserId(data.userId)
+                setShowTimer(true);
             }
         } catch (error) {
             if (error instanceof AxiosError) {
-                if(error.status === 404) {
+                if (error.status === 404) {
                     form.setError('email', {
                         type: 'custom',
                         message: 'Email not found',
-                    })
+                    });
                     return;
                 }
                 console.log('Send otp error', error);
             }
         }
     }
-
-    // Check otp
-    const otpDebounce = useDebounce(form.watch('otp'), 500);
-
-    useEffect(() => {
-        if (isMounted) {
-            checkOtp();
-        } else setIsMounted(true);
-
-        async function checkOtp() {
-            const isValid = await form.trigger('otp');
-            
-            if (!isValid) {
-                console.log('otp invalid');
-                return;
-            }
-
-            try {
-                const { data } = await authApis.checkOtp(otpDebounce);
-
-                if (data.isValid) {
-                    setDisabledInputs(prev => [...prev.filter(item => item !== 'info'), 'otp', 'getOtp'])
-                } else {
-                    form.setError('otp', {
-                        type: 'custom',
-                        message: 'Invalid OTP',
-                    })
-                }
-            } catch (error) {
-                console.log('error check otp', error);
-            }
-        }
-    }, [otpDebounce]);
 
     return (
         <div className="flex-center min-h-svh">
@@ -125,9 +95,7 @@ function Reset() {
                 </p>
 
                 <Form {...form}>
-                    <form
-                        className="flex flex-col gap-5 w-full"
-                    >
+                    <form className="flex flex-col gap-5 w-full">
                         <div>
                             <FormField
                                 control={form.control}
@@ -143,18 +111,20 @@ function Reset() {
 
                                         <FormDescription className="flex justify-end">
                                             <span
-                                                className={classNames(" font-medium", {
-                                                    "text-cerulean  cursor-pointer": !showTimer && !disabledInputs.includes('getOtp'),
-                                                    "text-cerulean-200 cursor-not-allowed": showTimer || disabledInputs.includes('getOtp'),
+                                                className={classNames(' font-medium', {
+                                                    'text-cerulean  cursor-pointer':
+                                                        !showTimer && !disabledInputs.includes('getOtp'),
+                                                    'text-cerulean-200 cursor-not-allowed':
+                                                        showTimer || disabledInputs.includes('getOtp'),
                                                 })}
                                                 onClick={() => {
-                                                    if(!showTimer && !disabledInputs.includes('getOtp')) {
-                                                        handleSendOTP()
+                                                    if (!showTimer && !disabledInputs.includes('getOtp')) {
+                                                        handleSendOTP();
                                                     }
                                                 }}
                                             >
                                                 Get OTP
-                                                {showTimer && <Timer duration={60} setShowTimer={setShowTimer}/>}
+                                                {showTimer && <Timer duration={60} setShowTimer={setShowTimer} />}
                                             </span>
                                         </FormDescription>
                                     </FormItem>
@@ -169,7 +139,7 @@ function Reset() {
                                     <FormItem>
                                         <FormLabel>OTP</FormLabel>
                                         <FormControl>
-                                            <Input  type="text"  {...field} />
+                                            <Input type="text" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -179,7 +149,7 @@ function Reset() {
                             <FormField
                                 control={form.control}
                                 name="password"
-                                disabled={disabledInputs.includes('info')}
+                                disabled={disabledInputs.includes('otp')}
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Password</FormLabel>
@@ -192,18 +162,23 @@ function Reset() {
                             />
                         </div>
 
-                        <Button type='button' className="w-full bg-picton_blue hover:bg-blue_(ncs)" onClick={async () => {
-                            const { invalid: emailInvalid } = form.getFieldState('email')
+                        <Button
+                            type="button"
+                            className="w-full bg-picton_blue hover:bg-blue_(ncs)"
+                            onClick={async () => {
+                                const { invalid: emailInvalid } = form.getFieldState('email');
 
-                            if(!emailInvalid) {
-                                const isFormValid = await form.trigger()
+                                if (!emailInvalid) {
+                                    const isFormValid = await form.trigger();
 
-                                if(isFormValid) {
-                                    handleResetAccount(form.getValues())
+                                    if (isFormValid) {
+                                        handleResetAccount(form.getValues());
+                                    }
                                 }
-                            } 
-                        }}>
-                            Sign up
+                            }}
+                            disabled={disabledInputs.includes('otp')}
+                        >
+                            Reset password
                         </Button>
                     </form>
                 </Form>

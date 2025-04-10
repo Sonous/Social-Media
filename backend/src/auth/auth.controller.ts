@@ -1,49 +1,45 @@
-import {
-    BadGatewayException,
-    Body,
-    Controller,
-    Get,
-    HttpCode,
-    HttpStatus,
-    Post,
-    Query,
-    Req,
-    Res,
-} from '@nestjs/common';
+import { BadGatewayException, Body, Controller, Get, ParseBoolPipe, Post, Query, Req, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { SigninDto } from './signin.dto';
+import { SigninDto } from './dtos/signin.dto';
 import { Request, Response } from 'express';
 import { Public } from './public.decorator';
+import { SignUpDto } from './dtos/signUp.dto';
+import { ResetDto } from './dtos/reset.dto';
 
 @Public()
 @Controller('auth')
 export class AuthController {
     constructor(private authService: AuthService) {}
 
-    @Get('signup')
-    async sendMail(@Query('email') email: string) {
-        return await this.authService.signUp(email);
+    @Get('send-otp')
+    async sendOTP(@Query('email') email: string, @Query('isReset', ParseBoolPipe) isReset: boolean) {
+        return await this.authService.sendMail(email, isReset);
     }
 
-    @Get('verify-otp')
-    verifyOtp(@Query('otp') otp: string) {
-        const isValid = this.authService.verifyOtp(otp);
-
-        return { isValid };
-    }
-
-    @HttpCode(HttpStatus.OK)
     @Post('login')
     async login(@Body() signInDto: SigninDto, @Res({ passthrough: true }) res: Response) {
         const { accessToken, refreshToken } = await this.authService.login(signInDto.email, signInDto.password);
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
-            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+            secure: true,
+            sameSite: 'none',
+            path: '/',
+            maxAge: 7 * 24 * 60 * 60 * 1000,
         });
 
         return {
             accessToken,
         };
+    }
+
+    @Post('signup')
+    async signup(@Body() signUpDto: SignUpDto) {
+        return await this.authService.signup(signUpDto.user, signUpDto.otp);
+    }
+
+    @Post('reset')
+    async resetPassword(@Body() { email, otp, password }: ResetDto) {
+        return await this.authService.resetPassword(email, otp, password);
     }
 
     @Get('refresh-token')
@@ -59,10 +55,5 @@ export class AuthController {
         return {
             accessToken,
         };
-    }
-
-    @Get('reset')
-    async resetPassword(@Query('email') email: string) {
-        return await this.authService.resetPassword(email);
     }
 }

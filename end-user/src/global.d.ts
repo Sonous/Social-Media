@@ -124,3 +124,10 @@ declare type Notification = {
 }
 
 type FolderType = 'avatars' | 'posts';
+
+type TokenPayload = {
+    user: User;
+    tokenType: 'accessToken' | 'refreshToken';
+    iat: number;
+    exp: number;
+};

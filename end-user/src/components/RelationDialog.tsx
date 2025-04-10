@@ -2,9 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import Search from './Search';
 import useDebounce from '@/hooks/useDebounce';
 import userApis from '@/apis/users.api';
-import { useAppSelector } from '@/hooks/reduxHooks';
-import { selectUser } from '@/store/slices/UserSlice';
 import UserCard from './UserCard';
+import useTokenStore from '@/store/useTokenStore';
 
 const RelationDialog = ({
     type,
@@ -21,7 +20,7 @@ const RelationDialog = ({
     const [relations, setRelations] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [refetching, setRefetching] = useState(false);
-    const user = useAppSelector(selectUser);
+    const user = useTokenStore(state => state.user as User);
 
     const handleHideDialog = (event: React.MouseEvent) => {
         if (dialogRef.current && !dialogRef.current.contains(event.target as Node)) {

@@ -6,8 +6,6 @@ import { Bookmark, CirclePlus, Heart, MessageCircle, Settings2 } from 'lucide-re
 import classNames from 'classnames';
 import { formatDate } from '@/utils/formatDate';
 import CustomAvatar from './CustomAvatar';
-import { useAppSelector } from '@/hooks/reduxHooks';
-import { selectUser } from '@/store/slices/UserSlice';
 import postApis from '@/apis/posts.api';
 import savedApis from '@/apis/saved.api';
 import useDebounce from '@/hooks/useDebounce';
@@ -17,6 +15,7 @@ import Comment from './Comment';
 import { extractMentions } from '@/utils/extractMentions';
 import _ from 'lodash';
 import { useNavigate } from 'react-router';
+import useTokenStore from '@/store/useTokenStore';
 
 const Post = ({ type, post }: { type: 'simple' | 'normal' | 'modal'; post: Post }) => {
     const postRef = useRef<HTMLDivElement | null>(null);
@@ -35,7 +34,7 @@ const Post = ({ type, post }: { type: 'simple' | 'normal' | 'modal'; post: Post 
     const [showPlusButton, setShowPlusButton] = useState<boolean | undefined>();
     const [page, setPage] = useState(1);
     const [recentComments, setRecentComments] = useState<CustomComment[]>([]);
-    const user = useAppSelector(selectUser);
+    const user = useTokenStore(state => state.user as User);
 
     useEffect(() => {
         fetchPostInfo();
@@ -225,8 +224,8 @@ const Post = ({ type, post }: { type: 'simple' | 'normal' | 'modal'; post: Post 
         <>
             {type !== 'simple' && postOwner && (
                 <div
-                    className={classNames({
-                        'absolute bg-black top-0 right-0 bg-opacity-50 h-svh w-full flex-center z-30 transition-all': type === 'modal',
+                    className={classNames('flex-center w-full',{
+                        'absolute bg-black top-0 right-0 bg-opacity-50 h-svh z-30 transition-all': type === 'modal',
                     })}
                     onClick={handleCloseModal}
                 >

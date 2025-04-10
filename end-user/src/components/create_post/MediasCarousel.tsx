@@ -5,6 +5,8 @@ import Video from '../Video';
 
 const MediasCarousel = ({ medias, className }: { medias: MediaType[]; className?: string }) => {
     const [api, setApi] = React.useState<CarouselApi>();
+    // const [status, setStatus] = React.useState<'loading' | 'loaded'>('loading');
+
     // const [current, setCurrent] = React.useState(0);
     // const [count, setCount] = React.useState(0);
 
@@ -25,11 +27,20 @@ const MediasCarousel = ({ medias, className }: { medias: MediaType[]; className?
         <Carousel setApi={setApi} className="h-full">
             <CarouselContent className="h-full">
                 {medias?.map((media, index) => (
-                    <CarouselItem key={index} >
+                    <CarouselItem key={index}>
+                        {/* {status === 'loading' && <Skeleton className="w-full h-[200px] md:h-[400px] rounded-lg" />} */}
                         {media.type === 'image' ? (
-                            <img src={media.url} className={`object-cover aspect-[4/3] ${className}`} />
+                            <img
+                                src={media.url}
+                                className={`object-cover aspect-[4/3] ${className}`}
+                                // onLoad={() => setStatus('loaded')}
+                            />
                         ) : (
-                            <Video src={media.url} className={`object-cover aspect-[4/3] ${className}`} />
+                            <Video
+                                src={media.url}
+                                className={`object-cover aspect-[4/3] ${className}`}
+                                // onLoad={() => setStatus('loaded')}
+                            />
                         )}
                     </CarouselItem>
                 ))}
