@@ -5,8 +5,7 @@ import { Loading } from '@/components/Loading';
 import RelationDialog from '@/components/RelationDialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { useAppSelector } from '@/hooks/reduxHooks';
-import { selectUser } from '@/store/slices/UserSlice';
+import useTokenStore from '@/store/useTokenStore';
 import { AxiosError } from 'axios';
 import { Bookmark, Captions, Settings2 } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
@@ -21,7 +20,7 @@ export const Profile = () => {
     const [relation, setRelation] = useState<Relation | undefined>();
     const [refresh, setRefresh] = useState(false);
     const location = useLocation();
-    const user = useAppSelector(selectUser);
+    const user = useTokenStore(state => state.user as User);
     const navigate = useNavigate();
     const avatarInputRef = useRef<HTMLInputElement | null>(null);
 

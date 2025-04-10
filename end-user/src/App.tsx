@@ -4,8 +4,6 @@ import MainLayout from './layouts/MainLayout';
 import Login from './pages/auth/Login';
 import Signup from './pages/auth/Signup';
 import Reset from './pages/auth/Reset';
-import { ProtectedRoutes } from './utils/AuthProtectedRoutes';
-import { UnauthorProtectRoute } from './utils/UnauthorProtectRoute';
 import { Inbox } from './pages/inbox/Inbox';
 import { Profile } from './pages/profile/Profile';
 import Posts from './pages/profile/Posts';
@@ -14,12 +12,14 @@ import ChatRoom from './pages/inbox/ChatRoom';
 import NotFound from './pages/NotFound';
 import AccountLayout from './layouts/AccountLayout';
 import EditProfile from './pages/setting/EditProfile';
+import { UnauthorProtectRoutes } from './utils/UnauthorProtectRoute';
+import { AuthProtectedRoutes } from './utils/AuthorProtectRoute';
 
 function App() {
     return (
         <BrowserRouter>
             <Routes>
-                <Route element={<ProtectedRoutes />}>
+                <Route element={<AuthProtectedRoutes />}>
                     <Route element={<MainLayout />}>
                         <Route index element={<Home />} />
                         <Route path="/inbox">
@@ -39,7 +39,7 @@ function App() {
                     </Route>
                 </Route>
 
-                <Route element={<UnauthorProtectRoute />}>
+                <Route element={<UnauthorProtectRoutes />}>
                     <Route path="/login" element={<Login />} />
                     <Route path="/signup" element={<Signup />} />
                     <Route path="/reset" element={<Reset />} />

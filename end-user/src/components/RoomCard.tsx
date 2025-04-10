@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
 import CustomAvatar from './CustomAvatar';
-import { useAppSelector } from '@/hooks/reduxHooks';
-import { selectUser } from '@/store/slices/UserSlice';
 import { useNavigate } from 'react-router';
 import { io } from 'socket.io-client';
+import useTokenStore from '@/store/useTokenStore';
 
 const RoomCard = ({ room }: { room: Room }) => {
-    const user = useAppSelector(selectUser);
+    const user = useTokenStore(state => state.user as User);
     const navigate = useNavigate();
     const [latestMessage, setLatestMessage] = useState<Message | undefined>(room.latestMessage);
 

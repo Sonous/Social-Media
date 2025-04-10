@@ -1,16 +1,4 @@
-import {
-    BadRequestException,
-    Body,
-    Controller,
-    Delete,
-    Get,
-    Param,
-    Post,
-    Put,
-    Query,
-    Request,
-    UseGuards,
-} from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Param, Post, Put, Query, Request } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UsersService } from './users.service';
 import { CreateRelationDto } from './dtos/create-relation.dto';
@@ -30,7 +18,7 @@ export class UsersController {
 
     @Get()
     async getUserByUsername(@Query('username') username: string) {
-        return await this.usersService.getUserByUsername(username);
+        return await this.usersService.getUserBy({ username });
     }
 
     @Get('validate-username')
@@ -41,7 +29,7 @@ export class UsersController {
     @Get('user-token')
     async getUserByToken(@Request() req: Request & { user: { id: string; email: string } }) {
         return {
-            user: await this.usersService.getUserById(req.user.id),
+            user: await this.usersService.getUserBy({ id: req.user.id }),
         };
     }
 
@@ -94,7 +82,7 @@ export class UsersController {
 
     @Get(':id')
     async getUserById(@Param('id') id: string) {
-        return await this.usersService.getUserById(id);
+        return await this.usersService.getUserBy({ id });
     }
 
     @Put(':id')

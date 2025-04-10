@@ -1,10 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuthService } from 'src/auth/auth.service';
 import { Users } from 'src/entities/user.entity';
 import { Brackets, Repository } from 'typeorm';
 import { UserInterface } from './interfaces/user.interface';
-import { PostsService } from 'src/posts/posts.service';
+// import { PostsService } from 'src/posts/posts.service';
 import { DEFAULT_LIMIT, DEFAULT_OFFSET } from 'src/constants';
 
 type ValidateUsername = {
@@ -19,8 +19,8 @@ export class UsersService {
 
     constructor(
         @InjectRepository(Users) private usersRepository: Repository<Users>,
-        private authService: AuthService,
-        private postsService: PostsService,
+        @Inject(forwardRef(() => AuthService)) private readonly authService: AuthService,
+        // private postsService: PostsService,
     ) {}
 
     async validateUsername(username: string): Promise<ValidateUsername> {
@@ -57,41 +57,7 @@ export class UsersService {
             .execute();
     }
 
-    async getUserById(id: string) {
-        const user = await this.usersRepository
-            .createQueryBuilder('user')
-            .leftJoinAndSelect('user.posts', 'post')
-            .leftJoinAndSelect('user.followers', 'followers')
-            .leftJoinAndSelect('user.following', 'following')
-            .select([
-                'user.id',
-                'user.name',
-                'user.username',
-                'user.email',
-                'user.avatar_url',
-                'user.bio',
-                'post',
-                'followers',
-                'following',
-            ])
-            .where('user.id = :id', { id })
-            .getOne();
-
-        if (!user) {
-            throw new NotFoundException('User not found', {
-                description: `User with id ${id} not found`,
-            });
-        }
-
-        return {
-            ...user,
-            posts: user.posts.length,
-            followers: user.followers.length,
-            following: user.following.length,
-        };
-    }
-
-    async getUserByUsername(username: string) {
+    async getUserBy(conditions: Partial<UserInterface>, selectPassword: boolean = false) {
         const user = await this.usersRepository.findOne({
             select: {
                 id: true,
@@ -100,6 +66,7 @@ export class UsersService {
                 email: true,
                 avatar_url: true,
                 bio: true,
+                password: selectPassword,
                 created_at: true,
                 posts: true,
                 followers: {
@@ -115,7 +82,7 @@ export class UsersService {
                 following: true,
             },
             where: {
-                username,
+                ...conditions,
             },
         });
 
@@ -129,6 +96,11 @@ export class UsersService {
             followers: user.followers.length,
             following: user.following.length,
         };
+    }
+
+    async checkUserBy(conditions: Partial<UserInterface>) {
+        const count = await this.usersRepository.countBy({ ...conditions });
+        return count > 0;
     }
 
     async updateUserById(id: string, user: Partial<UserInterface>) {
@@ -256,9 +228,5 @@ export class UsersService {
             .getMany();
 
         return users;
-    }
-
-    async checkUserExists(userId: string) {
-        return (await this.usersRepository.findOneBy({ id: userId })) || false;
     }
 }

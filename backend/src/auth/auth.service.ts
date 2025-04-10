@@ -1,18 +1,16 @@
 import { MailerService } from '@nestjs-modules/mailer';
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { totp } from 'otplib';
 import * as bcrypt from 'bcrypt';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Users } from 'src/entities/user.entity';
-import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class AuthService {
     constructor(
         private readonly mailService: MailerService,
-        @InjectRepository(Users) private usersRepository: Repository<Users>,
-        private jwtService: JwtService,
+        @Inject(forwardRef(() => UsersService)) private readonly userService: UsersService,
+        private readonly jwtService: JwtService,
     ) {
         totp.options = {
             step: 60,
@@ -49,14 +47,9 @@ export class AuthService {
     }
 
     async login(email: string, password: string): Promise<{ accessToken: string; refreshToken: string }> {
-        const user = await this.usersRepository
-            .createQueryBuilder('user')
-            .where('user.email = :email', { email })
-            .getOne();
+        const user = await this.userService.getUserBy({ email }, true);
 
-        if (!user) {
-            throw new NotFoundException('User not found');
-        }
+        console.log(user);
 
         const isMatch = await this.comparePassword(password, user.password);
 
@@ -78,7 +71,7 @@ export class AuthService {
                 tokenType: 'accessToken',
             },
             {
-                expiresIn: '1m',
+                expiresIn: '15p',
             },
         );
         const refreshToken = await this.jwtService.signAsync(
@@ -98,37 +91,37 @@ export class AuthService {
     }
 
     async verifyRefreshToken(token: string) {
-        const payload: TokenPayload = await this.jwtService.verifyAsync(token);
+        try {
+            const payload: TokenPayload = await this.jwtService.verifyAsync(token);
 
-        if (payload.tokenType !== 'refreshToken') {
-            throw new UnauthorizedException('Invalid token type! Expected refresh token');
+            if (payload.tokenType !== 'refreshToken') {
+                throw new UnauthorizedException('Invalid token type! Expected refresh token');
+            }
+
+            const user = await this.userService.getUserBy({ id: payload.user.id });
+
+            if (!user) {
+                throw new NotFoundException('User not found');
+            }
+
+            const accessToken = await this.jwtService.signAsync(
+                {
+                    user: { ...user },
+                    tokenType: 'accessToken',
+                },
+                {
+                    expiresIn: '15m',
+                },
+            );
+
+            return accessToken;
+        } catch (error) {
+            throw new UnauthorizedException(error);
         }
-
-        const user = await this.usersRepository.findOneBy({ id: payload.user.id });
-
-        if (!user) {
-            throw new NotFoundException('User not found');
-        }
-        delete user.password; // Remove password from user object
-
-        const accessToken = await this.jwtService.signAsync(
-            {
-                user: { ...user },
-                tokenType: 'accessToken',
-            },
-            {
-                expiresIn: '1m',
-            },
-        );
-
-        return accessToken;
     }
 
     async signUp(email: string) {
-        const user = await this.usersRepository
-            .createQueryBuilder('user')
-            .where('user.email = :email', { email })
-            .getOne();
+        const user = await this.userService.checkUserBy({ email });
 
         if (user) {
             throw new UnauthorizedException('Email already exists');
@@ -138,14 +131,7 @@ export class AuthService {
     }
 
     async resetPassword(email: string) {
-        const user: Users = await this.usersRepository
-            .createQueryBuilder('user')
-            .where('user.email = :email', { email })
-            .getOne();
-
-        if (!user) {
-            throw new NotFoundException('User not found');
-        }
+        const user = await this.userService.getUserBy({ email });
 
         await this.sendOtp(email);
 

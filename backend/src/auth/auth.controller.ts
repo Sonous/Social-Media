@@ -1,15 +1,4 @@
-import {
-    BadGatewayException,
-    Body,
-    Controller,
-    Get,
-    HttpCode,
-    HttpStatus,
-    Post,
-    Query,
-    Req,
-    Res,
-} from '@nestjs/common';
+import { BadGatewayException, Body, Controller, Get, Post, Query, Req, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SigninDto } from './signin.dto';
 import { Request, Response } from 'express';
@@ -32,13 +21,13 @@ export class AuthController {
         return { isValid };
     }
 
-    @HttpCode(HttpStatus.OK)
     @Post('login')
     async login(@Body() signInDto: SigninDto, @Res({ passthrough: true }) res: Response) {
         const { accessToken, refreshToken } = await this.authService.login(signInDto.email, signInDto.password);
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
             maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+            path: '/',
         });
 
         return {

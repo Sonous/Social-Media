@@ -1,6 +1,5 @@
 import axiosInstance from '@/configs/axios.config';
 import { AxiosResponse } from 'axios';
-import userApis from './users.api';
 
 const authApis = {
     sendOpt(email: string) {
@@ -12,20 +11,26 @@ const authApis = {
     },
 
     async login(email: string, password: string) {
-        const { data: { accessToken: access_token } } = await axiosInstance.post<{ accessToken: string }>('/auth/login', { email, password });
+        const {
+            data: { accessToken },
+        } = await axiosInstance.post<{ accessToken: string }>('/auth/login', { email, password });
 
-        const user = await userApis.getUserByToken(access_token)
-
-        localStorage.setItem('auth_info', JSON.stringify({
-            access_token,
-            isLogged: true,
-        }));
-        return user
+        return accessToken;
     },
 
     reset(email: string) {
         return axiosInstance.get(`/auth/reset?email=${email}`);
-    }
+    },
+
+    async refreshToken() {
+        const {
+            data: { accessToken },
+        } = await axiosInstance.get<{ accessToken: string }>('/auth/refresh-token', {
+            withCredentials: true,
+        });
+
+        return accessToken;
+    },
 };
 
 export default authApis;

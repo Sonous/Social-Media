@@ -18,11 +18,7 @@ export class ChatsService {
     ) {}
 
     async createRoom(room: RoomInterface, userIds: string[]) {
-        const usersPromise = userIds.map(async (userId) => {
-            const user = await this.usersService.checkUserExists(userId);
-
-            return user;
-        });
+        const usersPromise = userIds.map(async (userId) => await this.usersService.checkUserBy({ id: userId }));
         const users = await Promise.all(usersPromise);
         if (users.includes(false)) {
             throw new NotFoundException('User not found');
@@ -108,9 +104,9 @@ export class ChatsService {
     }
 
     async getRoomsByName(name: string, userId: string) {
-        const user = await this.usersService.getUserById(userId);
+        const isExisted = await this.usersService.checkUserBy({ id: userId });
 
-        if (!user) {
+        if (!isExisted) {
             throw new NotFoundException('User not found');
         }
 

@@ -1,9 +1,8 @@
 import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Button } from './ui/button';
-import { useAppSelector } from '@/hooks/reduxHooks';
-import { selectUser } from '@/store/slices/UserSlice';
 import userApis from '@/apis/users.api';
+import useTokenStore from '@/store/useTokenStore';
 
 const UserCard = ({
     user,
@@ -12,7 +11,7 @@ const UserCard = ({
     user: User & { relation: string };
     setRefetching: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
-    const currentUser = useAppSelector(selectUser);
+    const currentUser = useTokenStore(state => state.user as User);
 
     function showButton(): React.ReactNode {
         switch (user.relation) {
