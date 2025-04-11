@@ -19,7 +19,7 @@ import useTokenStore from '@/store/useTokenStore';
 
 const Post = ({ type, post }: { type: 'simple' | 'normal' | 'modal'; post: Post }) => {
     const postRef = useRef<HTMLDivElement | null>(null);
-    const { setIsOpenPostModal, setPost } = useContext(PostModalContext);
+    const { setIsOpenPostModal, setPost, isOpenPostModal } = useContext(PostModalContext);
     const [currentWorkPost, setCurrentWorkPost] = useState(post);
     const [postOwner, setPostOwner] = useState<User>();
     const [isLike, setIsLike] = useState(false);
@@ -114,7 +114,7 @@ const Post = ({ type, post }: { type: 'simple' | 'normal' | 'modal'; post: Post 
         }
     }, [likeDebounce]);
 
-    // like process
+    // saved process
     const savedDebounce = useDebounce(isMark, 500);
 
     useEffect(() => {
@@ -165,7 +165,8 @@ const Post = ({ type, post }: { type: 'simple' | 'normal' | 'modal'; post: Post 
                     return uniqueArr;
                 });
             } catch (error) {
-                console.log(error);
+                console.log('error', error);
+                setIsOpenPostModal(false);
             }
         }
     }, [type, page]);
@@ -368,6 +369,7 @@ const Post = ({ type, post }: { type: 'simple' | 'normal' | 'modal'; post: Post 
                     key={post.id}
                     className="cursor-pointer"
                     onClick={() => {
+                        console.log(isOpenPostModal)
                         setPost(post);
                         setIsOpenPostModal(true);
                     }}

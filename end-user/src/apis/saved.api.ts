@@ -1,58 +1,37 @@
-import axiosInstance from "@/configs/axios.config";
+import axiosInstance from '@/configs/axios.config';
 
 const savedApis = {
-    getSavedPostsByUserId(id: string, page: number){
-        const { access_token } = JSON.parse(localStorage.getItem('auth_info') || '{}')
-        
+    getSavedPostsByUserId(id: string, page: number) {
         return axiosInstance.get(`/saved/users/${id}`, {
-            headers: {
-                Authorization: `Bearer ${access_token}`,
-            },
             params: {
-                page
-            }
-        })
+                page,
+            },
+        });
     },
 
     async addSavedPost(post_id: string, user_id: string) {
-        const { access_token } = JSON.parse(localStorage.getItem('auth_info') || '{}')
-        
         await axiosInstance.post(`/saved`, {
             post_id,
-            user_id
-        }, {
-            headers: {
-                Authorization: `Bearer ${access_token}`,
-            }
-        })
+            user_id,
+        });
     },
 
     async removeSavedPost(post_id: string, user_id: string) {
-        const { access_token } = JSON.parse(localStorage.getItem('auth_info') || '{}')
-        
-        await axiosInstance.delete(`/saved`,  {
-            headers: {
-                Authorization: `Bearer ${access_token}`,
-            },
+        await axiosInstance.delete(`/saved`, {
             params: {
                 post_id,
-                user_id
+                user_id,
             },
-        })
+        });
     },
 
     async checkSavedPost(post_id: string, user_id: string) {
-        const { access_token } = JSON.parse(localStorage.getItem('auth_info') || '{}')
-        
-        return await axiosInstance.get<{ isExists: boolean }>(`/saved/check-saved`,  {
-            headers: {
-                Authorization: `Bearer ${access_token}`,
-            },
+        return await axiosInstance.get<{ isExists: boolean }>(`/saved/check-saved`, {
             params: {
                 post_id,
-                user_id
+                user_id,
             },
-        })
+        });
     },
 };
 

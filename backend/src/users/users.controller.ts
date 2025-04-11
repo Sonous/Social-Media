@@ -28,13 +28,6 @@ export class UsersController {
         return await this.usersService.validateUsername(username);
     }
 
-    @Get('user-token')
-    async getUserByToken(@Request() req: Request & { user: { id: string; email: string } }) {
-        return {
-            user: await this.usersService.getUserBy({ id: req.user.id }),
-        };
-    }
-
     // relation Api
     @Get(':id/followers')
     async getUserFollowers(
@@ -84,7 +77,12 @@ export class UsersController {
 
     @Get(':id')
     async getUserById(@Param('id') id: string) {
-        return await this.usersService.getUserBy({ id });
+        try {
+            return await this.usersService.getUserBy({ id });
+        } catch (error) {
+            console.error(error);
+            throw new BadRequestException('User not found');
+        }
     }
 
     @Put(':id')

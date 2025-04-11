@@ -4,6 +4,12 @@ import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { IS_PUBLIC_KEY } from './public.decorator';
 
+enum TokenErrorType {
+    EXPIRED = 'EXPIRED',
+    INVALID = 'INVALID',
+    NOPROVIDED = 'NOPROVIDED',
+}
+
 @Injectable()
 export class AuthGuard implements CanActivate {
     constructor(
@@ -24,18 +30,30 @@ export class AuthGuard implements CanActivate {
         const token = this.extractTokenFromHeader(req);
 
         if (!token) {
-            throw new UnauthorizedException('No token provided');
+            throw new UnauthorizedException({
+                message: 'No token provided',
+                errorType: TokenErrorType.NOPROVIDED,
+                statusCode: 401,
+            });
         }
 
         try {
             const payload: TokenPayload = await this.jwtService.verifyAsync(token);
             if (payload.tokenType !== 'accessToken') {
-                throw new UnauthorizedException('Invalid token type');
+                throw new UnauthorizedException({
+                    message: 'Invalid token type',
+                    errorType: TokenErrorType.INVALID,
+                    statusCode: 401,
+                });
             }
 
             req['user'] = payload.user;
         } catch (error) {
-            throw new UnauthorizedException(error);
+            throw new UnauthorizedException({
+                message: error.message,
+                errorType: TokenErrorType.EXPIRED,
+                statusCode: 401,
+            });
         }
 
         return true;
