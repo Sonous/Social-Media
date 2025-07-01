@@ -7,8 +7,8 @@ function NavItem({
     label,
     isActive,
     applyMediaQuery = true,
-    onClick,
-    miniPopup
+    onClick = () => {},
+    miniPopup = 'none',
 }: {
     iconElement?: React.ReactElement;
     label: string;

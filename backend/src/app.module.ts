@@ -9,7 +9,7 @@ import { Users } from './entities/user.entity';
 import { Time } from './entities/time.entity';
 import { PostsModule } from './posts/posts.module';
 import { Posts } from './entities/post.entity';
-import { APP_PIPE } from '@nestjs/core';
+import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { HashtagsModule } from './hashtags/hashtags.module';
 import { Hashtags } from './entities/hashtags.entity';
 import { Saved } from './entities/saved.entity';
@@ -22,6 +22,7 @@ import { Messages } from './entities/message.entity';
 import { RoomsUsers } from './entities/roomsUsers.entity';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { parse } from 'pg-connection-string';
+import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
 
 @Module({
     imports: [
@@ -42,6 +43,10 @@ import { parse } from 'pg-connection-string';
                     entities: [Users, Time, Posts, Hashtags, Saved, Comments, Rooms, Messages, RoomsUsers],
                 };
             },
+        }),
+        CacheModule.register({
+            ttl: 60 * 5, // cache trong 5 phút
+            max: 100, // tối đa 100 item
         }),
         AuthModule,
         UsersModule,
@@ -66,6 +71,10 @@ import { parse } from 'pg-connection-string';
         {
             provide: 'DEFAULT_LIMIT',
             useValue: 10,
+        },
+        {
+            provide: APP_INTERCEPTOR,
+            useClass: CacheInterceptor,
         },
     ],
 })

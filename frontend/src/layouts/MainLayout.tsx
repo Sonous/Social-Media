@@ -1,15 +1,22 @@
-import { Link, Outlet, useLocation, useNavigate } from 'react-router';
-import { AlignJustify, Bell, Bookmark, House, Search, Send, Settings2, SquarePlus } from 'lucide-react';
-import NavItem from '@/components/NavItem';
-import { useContext, useEffect, useRef, useState } from 'react';
-import { useAnimate } from 'motion/react';
 import CreateDialog from '@/components/create_post/CreateDialog';
-import { PostModalContext } from '@/context/PostModalProvider';
-import Post from '@/components/Post';
 import CustomAvatar from '@/components/CustomAvatar';
-import SearchModal from '@/components/SearchModal';
+import NavItem from '@/components/NavItem';
 import NotificationModal from '@/components/NotificationModal';
+import Post from '@/components/Post';
+import SearchModal from '@/components/SearchModal';
+import { Button } from '@/components/ui/button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { PostModalContext } from '@/context/PostModalProvider';
 import useTokenStore from '@/store/useTokenStore';
+import { AlignJustify, Bell, Bookmark, House, Search, Send, Settings2, SquarePlus } from 'lucide-react';
+import { useContext, useEffect, useRef, useState } from 'react';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router';
 
 const initNavItem: NavItem[] = [
     {
@@ -43,38 +50,18 @@ const initNavItem: NavItem[] = [
 
 function MainLayout() {
     const [navItems, setNavItems] = useState(initNavItem);
-    const [showMore, setShowMore] = useState(false);
     // const [isLoading, setIsLoading] = useState(false);
     const [showCreateDialog, setShowCreateDialog] = useState(false);
-    const moreRef = useRef<HTMLButtonElement | null>(null);
-    const [scope, animate] = useAnimate<HTMLDivElement>();
     const user = useTokenStore((state) => state.user);
     const { clearToken } = useTokenStore();
     const { isOpenPostModal, post } = useContext(PostModalContext);
-    // const [showSearchModal, setShowSearchModal] = useState(false);
-    // const [showNotificationModal, setShowNotificationModal] = useState(false);
     const [miniPopup, setMiniPopup] = useState<MiniPopupState>('none');
     const asideRef = useRef<HTMLDivElement | null>(null);
 
     const location = useLocation();
     const navigate = useNavigate();
 
-    // side effects
     useEffect(() => {
-        if (showMore) {
-            animate(scope.current, { display: 'flex', opacity: 1, transform: 'translateY(-10px)' });
-        } else {
-            animate(scope.current, { display: 'none', opacity: 0, transform: 'translateY(0px)' });
-        }
-    }, [showMore]);
-
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (moreRef.current && !moreRef.current.contains(event.target as Node)) {
-                setShowMore(false);
-            }
-        };
-
         const handleHideDialog = (event: MouseEvent) => {
             if (asideRef.current && !asideRef.current.contains(event.target as Node)) {
                 setMiniPopup('none');
@@ -82,7 +69,6 @@ function MainLayout() {
         };
 
         const handleHide = (event: MouseEvent) => {
-            handleClickOutside(event);
             handleHideDialog(event);
         };
 
@@ -177,32 +163,48 @@ function MainLayout() {
                             </div>
 
                             {/* TODO: Sử dụng shadcn component menu cho cái này */}
-                            <div className="relative max-sm:hidden">
-                                <div
-                                    ref={scope}
-                                    className="flex-col gap-2 absolute z-50 bg-white w-[200px] rounded-md p-3 shadow-md -right-[220px] -top-[120px] lg:-right-10 lg:-top-[170px] hidden"
-                                >
-                                    <Link to="/">
-                                        <NavItem iconElement={<Bookmark />} label="Bookmarks" applyMediaQuery={false} />
-                                    </Link>
-                                    <Link to="/accounts/edit">
-                                        <NavItem iconElement={<Settings2 />} label="Settings" applyMediaQuery={false} />
-                                    </Link>
-                                    <div className="w-full h-[1px] bg-[#b6b6b6]"></div>
-                                    <button
-                                        onClick={() => {
-                                            clearToken();
-                                            navigate('/login');
-                                        }}
-                                    >
-                                        <NavItem label="Logout" applyMediaQuery={false} />
-                                    </button>
-                                </div>
+                            {/* <Popover>
+                                <PopoverTrigger>
+                                    
+                                </PopoverTrigger>
+                                <PopoverContent></PopoverContent>
+                            </Popover> */}
 
-                                <button ref={moreRef} className="w-full" onClick={() => setShowMore(!showMore)}>
-                                    <NavItem iconElement={<AlignJustify />} label="More" />
-                                </button>
-                            </div>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger>
+                                    <NavItem iconElement={<AlignJustify />} label="More" miniPopup={miniPopup} />
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                    <DropdownMenuItem>
+                                        <Link to="/">
+                                            <Button variant={'ghost'}>
+                                                <Bookmark />
+                                                Bookmarks
+                                            </Button>
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem>
+                                        <Link to="/accounts/edit">
+                                            <Button variant={'ghost'}>
+                                                <Settings2 />
+                                                Settings
+                                            </Button>
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem>
+                                        <Button
+                                            variant={'ghost'}
+                                            onClick={() => {
+                                                clearToken();
+                                                navigate('/login');
+                                            }}
+                                        >
+                                            Logout
+                                        </Button>
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         </div>
                     </aside>
                     <div

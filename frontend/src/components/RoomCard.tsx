@@ -5,7 +5,7 @@ import { io } from 'socket.io-client';
 import useTokenStore from '@/store/useTokenStore';
 
 const RoomCard = ({ room }: { room: Room }) => {
-    const user = useTokenStore(state => state.user as User);
+    const user = useTokenStore((state) => state.user as User);
     const navigate = useNavigate();
     const [latestMessage, setLatestMessage] = useState<Message | undefined>(room.latestMessage);
 
@@ -24,17 +24,20 @@ const RoomCard = ({ room }: { room: Room }) => {
     }
 
     useEffect(() => {
+        console.log(import.meta.env.VITE_SOCKET_URL);
         const socket = io(import.meta.env.VITE_SOCKET_URL);
 
-        socket.on('connect', () => {
-            socket.emit('join-room', {
-                room_id: room.id,
-                user_id: user.id,
-            });
+        socket.emit('join-room', {
+            room_id: room.id,
+            user_id: user.id,
+        });
 
-            socket.on('new-message', (data) => {
-                setLatestMessage(data);
-            });
+        socket.on('new-message', (data) => {
+            setLatestMessage(data);
+        });
+
+        socket.on('exception', (error) => {
+            console.log('Server exception:', error);
         });
     }, []);
 

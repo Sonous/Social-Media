@@ -7,9 +7,10 @@ import { Messages } from 'src/entities/message.entity';
 import { RoomsUsers } from 'src/entities/roomsUsers.entity';
 import { ChatsController } from './chats.controller';
 import { UsersModule } from 'src/users/users.module';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Rooms, Messages, RoomsUsers]), UsersModule],
+    imports: [TypeOrmModule.forFeature([Rooms, Messages, RoomsUsers]), UsersModule, AuthModule],
     providers: [ChatGateWay, ChatsService],
     controllers: [ChatsController],
 })

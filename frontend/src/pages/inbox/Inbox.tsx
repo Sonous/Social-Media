@@ -1,11 +1,9 @@
 import roomApis from '@/apis/room.api';
 import RoomCard from '@/components/RoomCard';
 import Search from '@/components/Search';
-import { PostModalContext } from '@/context/PostModalProvider';
 import useDebounce from '@/hooks/useDebounce';
 import useTokenStore from '@/store/useTokenStore';
-import { SquarePen } from 'lucide-react';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export const Inbox = () => {
     const [rooms, setRooms] = useState<Room[]>([]);
