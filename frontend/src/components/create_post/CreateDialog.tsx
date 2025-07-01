@@ -74,7 +74,7 @@ const CreateDialog = ({
             setIsLoading(true);
 
             const uploadPromises = medias.map(async (media) => {
-                const url = await cloudinaryAPI.uploadImage(user.id, 'posts', media.file);
+                const url = await cloudinaryAPI.uploadMedia(user.id, 'posts', media.file);
 
                 return {
                     type: media.file.type.split('/')[0],

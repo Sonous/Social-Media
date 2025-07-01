@@ -1,17 +1,15 @@
-import React, { useContext, useEffect, useState } from 'react';
-import Search from './Search';
-import useDebounce from '@/hooks/useDebounce';
 import userApis from '@/apis/users.api';
-import CustomAvatar from './CustomAvatar';
+import useDebounce from '@/hooks/useDebounce';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { PostModalContext } from '@/context/PostModalProvider';
+import CustomAvatar from './CustomAvatar';
+import Search from './Search';
 
-const SearchModal = ({ setShowSearchModal }: { setShowSearchModal: React.Dispatch<React.SetStateAction<boolean>> }) => {
+const SearchModal = ({ setMiniPopup }: { setMiniPopup: React.Dispatch<React.SetStateAction<MiniPopupState>> }) => {
     const [searchInput, setSearchInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [users, setUsers] = useState<User[]>([]);
     const navigate = useNavigate();
-    const { setIsShowNavText } = useContext(PostModalContext);
 
     const searchDebounce = useDebounce(searchInput, 500);
 
@@ -34,7 +32,7 @@ const SearchModal = ({ setShowSearchModal }: { setShowSearchModal: React.Dispatc
     }, [searchDebounce]);
 
     return (
-        <div className="absolute sm:left-[100%] z-20 h-full bg-white transition-all sm:w-[400px] w-full sm:border-r-2 max-sm:bottom-[100%] max-sm:rounded-t-2xl max-sm:h-[400px] max-sm:border-t-2 max-sm:border-x-2 flex flex-col">
+        <div>
             <div className="p-5 border-b-2 space-y-5">
                 <h1 className="font-semibold text-xl">Search</h1>
                 <Search value={searchInput} setValue={setSearchInput} isLoading={isLoading} />
@@ -46,8 +44,7 @@ const SearchModal = ({ setShowSearchModal }: { setShowSearchModal: React.Dispatc
                             key={user.id}
                             className="flex gap-5 items-center cursor-pointer"
                             onClick={() => {
-                                setShowSearchModal(false);
-                                setIsShowNavText(true);
+                                setMiniPopup('none');
                                 navigate(`/${user.username}`);
                             }}
                         >

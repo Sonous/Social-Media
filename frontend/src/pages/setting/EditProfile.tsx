@@ -18,7 +18,7 @@ const EditProfile = () => {
         const avatar = event.target.files[0];
 
         try {
-            const imageUrl = await cloudinaryAPI.uploadImage(user.id, 'avatars', avatar);
+            const imageUrl = await cloudinaryAPI.uploadMedia(user.id, 'avatars', avatar);
 
             if (imageUrl) {
                 await userApis.updateUser(user.id, {

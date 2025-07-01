@@ -1,6 +1,5 @@
-import React, { useContext } from 'react';
 import classNames from 'classnames';
-import { PostModalContext } from '@/context/PostModalProvider';
+import React from 'react';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 function NavItem({
@@ -9,15 +8,15 @@ function NavItem({
     isActive,
     applyMediaQuery = true,
     onClick,
+    miniPopup
 }: {
     iconElement?: React.ReactElement;
     label: string;
     isActive?: boolean;
     applyMediaQuery?: boolean;
     onClick?: () => void;
+    miniPopup?: MiniPopupState
 }) {
-    const { isShowNavText } = useContext(PostModalContext);
-
     return (
         <Tooltip >
             <TooltipTrigger asChild>
@@ -27,7 +26,7 @@ function NavItem({
                         {
                             'border-2': isActive,
                             'lg:border-0 lg:pr-14': applyMediaQuery,
-                            'justify-center !pr-3': !isShowNavText,
+                            'justify-center !pr-3': miniPopup !== 'none',
                         },
                     )}
                     onClick={onClick}
@@ -37,7 +36,7 @@ function NavItem({
                         className={classNames('transition-all', {
                             'font-semibold': isActive,
                             'hidden lg:block': applyMediaQuery,
-                            '!hidden ': !isShowNavText,
+                            '!hidden ': miniPopup !== 'none',
                         })}
                     >
                         {label}

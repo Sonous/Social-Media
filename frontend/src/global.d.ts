@@ -131,3 +131,5 @@ type TokenPayload = {
     iat: number;
     exp: number;
 };
+
+type MiniPopupState = 'search' | 'notification' | 'none';

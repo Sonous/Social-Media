@@ -5,26 +5,19 @@ export const PostModalContext = createContext<{
     setIsOpenPostModal: React.Dispatch<React.SetStateAction<boolean>>;
     post: Post | undefined;
     setPost: React.Dispatch<React.SetStateAction<Post | undefined>>;
-    isShowNavText: boolean;
-    setIsShowNavText: React.Dispatch<React.SetStateAction<boolean>>;
 }>({
     isOpenPostModal: false,
     setIsOpenPostModal: () => {},
     post: undefined,
     setPost: () => {},
-    isShowNavText: false,
-    setIsShowNavText: () => {},
 });
 
 const PostModalProvider = ({ children }: { children: React.ReactNode }) => {
     const [isOpenPostModal, setIsOpenPostModal] = useState(false);
-    const [isShowNavText, setIsShowNavText] = useState(true);
     const [post, setPost] = useState<Post | undefined>();
 
     return (
-        <PostModalContext.Provider
-            value={{ isOpenPostModal, setIsOpenPostModal, post, setPost, isShowNavText, setIsShowNavText }}
-        >
+        <PostModalContext.Provider value={{ isOpenPostModal, setIsOpenPostModal, post, setPost }}>
             {children}
         </PostModalContext.Provider>
     );

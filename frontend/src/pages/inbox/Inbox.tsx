@@ -12,7 +12,6 @@ export const Inbox = () => {
     const user = useTokenStore(state => state.user as User);
     const [searchedString, setSearchedString] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const { setIsShowNavText } = useContext(PostModalContext);
 
     useEffect(() => {
         const fetchRooms = async () => {
@@ -75,7 +74,7 @@ export const Inbox = () => {
             <div className="w-full max-w-[500px] space-y-5">
                 <section className=" flex justify-between items-center">
                     <h1 className="text-xl font-semibold">Inbox</h1>
-                    <SquarePen onClick={() => setIsShowNavText(prev => !prev)}/>
+                    {/* <SquarePen onClick={() => setIsShowNavText(prev => !prev)}/> */}
                 </section>
 
                 <Search value={searchedString} setValue={setSearchedString} isLoading={isLoading} />

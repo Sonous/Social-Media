@@ -50,9 +50,10 @@ function MainLayout() {
     const [scope, animate] = useAnimate<HTMLDivElement>();
     const user = useTokenStore((state) => state.user);
     const { clearToken } = useTokenStore();
-    const { isOpenPostModal, post, setIsShowNavText } = useContext(PostModalContext);
-    const [showSearchModal, setShowSearchModal] = useState(false);
-    const [showNotificationModal, setShowNotificationModal] = useState(false);
+    const { isOpenPostModal, post } = useContext(PostModalContext);
+    // const [showSearchModal, setShowSearchModal] = useState(false);
+    // const [showNotificationModal, setShowNotificationModal] = useState(false);
+    const [miniPopup, setMiniPopup] = useState<MiniPopupState>('none');
     const asideRef = useRef<HTMLDivElement | null>(null);
 
     const location = useLocation();
@@ -76,8 +77,7 @@ function MainLayout() {
 
         const handleHideDialog = (event: MouseEvent) => {
             if (asideRef.current && !asideRef.current.contains(event.target as Node)) {
-                setIsShowNavText(true);
-                setShowSearchModal(false);
+                setMiniPopup('none');
             }
         };
 
@@ -118,9 +118,7 @@ function MainLayout() {
 
     function handleNavItem(navItem: NavItem) {
         if (navItem.link) {
-            setIsShowNavText(true);
-            setShowSearchModal(false);
-            setShowNotificationModal(false);
+            setMiniPopup('none');
             navigate(navItem.link);
         } else if (navItem.label) {
             switch (navItem.label) {
@@ -128,12 +126,10 @@ function MainLayout() {
                     setShowCreateDialog(true);
                     break;
                 case 'Search':
-                    setIsShowNavText((prev) => !prev);
-                    setShowSearchModal(!showSearchModal);
+                    setMiniPopup((prev) => (prev === 'search' ? 'none' : 'search'));
                     break;
                 case 'Notifications':
-                    setIsShowNavText((prev) => !prev);
-                    setShowNotificationModal(!showNotificationModal);
+                    setMiniPopup((prev) => (prev === 'notification' ? 'none' : 'notification'));
                     break;
                 default:
                     break;
@@ -161,6 +157,7 @@ function MainLayout() {
                                         label={navItem.label}
                                         isActive={navItem.isActive}
                                         onClick={() => handleNavItem(navItem)}
+                                        miniPopup={miniPopup}
                                     />
                                 ))}
                                 {user && (
@@ -171,10 +168,10 @@ function MainLayout() {
                                         label={'Profile'}
                                         isActive={location.pathname.includes(user.username)}
                                         onClick={() => {
-                                            setIsShowNavText(true);
-                                            setShowSearchModal(false);
+                                            setMiniPopup('none');
                                             navigate(`/${user.username}`);
                                         }}
+                                        miniPopup={miniPopup}
                                     />
                                 )}
                             </div>
@@ -208,8 +205,14 @@ function MainLayout() {
                             </div>
                         </div>
                     </aside>
-                    {showSearchModal && <SearchModal setShowSearchModal={setShowSearchModal} />}
-                    {showNotificationModal && <NotificationModal />}
+                    <div
+                        className={`absolute sm:left-[100%] z-20 bg-white transition-all duration-300 sm:rounded-r-xl shadow-[4px_0_12px_-2px_rgba(0,0,0,0.4)] flex flex-col overflow-hidden w-full h-full ${
+                            miniPopup === 'none' ? 'sm:w-0 max-sm:h-0' : 'lg:w-[400px] sm:w-[300px]  max-sm:h-[400px]'
+                        }`}
+                    >
+                        {miniPopup === 'search' && <SearchModal setMiniPopup={setMiniPopup} />}
+                        {miniPopup === 'notification' && <NotificationModal />}
+                    </div>
                 </div>
 
                 <div className="overflow-y-auto max-sm:flex-1 order-1 w-full">

@@ -41,19 +41,22 @@ export const Profile = () => {
         }
 
         async function fetchProfile(state: ProfileState) {
-            let profile = user;
-
             try {
                 if (state === 'other') {
                     const { data } = await userApis.getUserByUsername(username);
 
-                    profile = { ...data };
+                    setProfile(
+                        { ...data }
+                    );
                     await checkRelation(user.id, data.id);
+                } else {
+                    const { data } = await userApis.getUserById(user.id);
+
+                    console.log(data);
+
+                    setProfile({ ...data });
                 }
 
-                setProfile({
-                    ...profile,
-                });
             } catch (error) {
                 if (error instanceof AxiosError) {
                     if (error.status === 404) {
@@ -82,7 +85,7 @@ export const Profile = () => {
         const avatar = event.target.files[0];
 
         try {
-            const imageUrl = await cloudinaryAPI.uploadImage(user.id, 'avatars', avatar)
+            const imageUrl = await cloudinaryAPI.uploadMedia(user.id, 'avatars', avatar)
 
             if (imageUrl) {
                 await userApis.updateUser(user.id, {
@@ -112,6 +115,8 @@ export const Profile = () => {
             console.log(error);
         }
     };
+
+    // console.log(profile);
 
     return (
         <div className="py-10 sm:profile-width sm:p-5 m-auto pt-10">
@@ -215,7 +220,7 @@ export const Profile = () => {
 
                         <section className="max-sm:pl-5">
                             <div className="font-semibold">{profile?.name}</div>
-                            <div>{profile?.bio}</div>
+                            <p>{profile?.bio}</p>
                         </section>
                     </header>
 
