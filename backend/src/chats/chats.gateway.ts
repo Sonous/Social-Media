@@ -1,4 +1,4 @@
-import { UsePipes, ValidationPipe } from '@nestjs/common';
+import { UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import {
     ConnectedSocket,
     MessageBody,
@@ -13,6 +13,7 @@ import { Server, Socket } from 'socket.io';
 import { ChatsService } from './chats.service';
 import { CreateMessageDto } from './dtos/create-message.dto';
 import { JoinRoomDto } from './dtos/join-room.dto';
+import { SocketGuard } from './socket.guard';
 
 @UsePipes(
     new ValidationPipe({
@@ -26,9 +27,10 @@ import { JoinRoomDto } from './dtos/join-room.dto';
         credentials: true,
     },
 })
-// @UseGuards(AuthGuard)
+@UseGuards(SocketGuard)
 export class ChatGateWay {
-    @WebSocketServer() server: Server;
+    @WebSocketServer()
+    private server: Server;
 
     constructor(private chatsService: ChatsService) {}
 
@@ -54,8 +56,13 @@ export class ChatGateWay {
     @SubscribeMessage('send-message')
     async handleSendMessage(@MessageBody() message: CreateMessageDto, @ConnectedSocket() client: Socket) {
         try {
+            console.log('Received message:', message);
             const newMessage = await this.chatsService.createMessage(message);
             this.server.to(message.room_id).emit('new-message', newMessage);
+            return {
+                message: 'Message sent successfully',
+                data: newMessage,
+            };
         } catch (error) {
             client.leave(message.room_id);
             throw new WsException({

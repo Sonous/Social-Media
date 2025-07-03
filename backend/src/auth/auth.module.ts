@@ -45,7 +45,7 @@ import { AuthGuard } from './auth.guard';
         }),
         forwardRef(() => UsersModule),
     ],
-    exports: [AuthService],
+    exports: [AuthService, JwtModule],
     controllers: [AuthController],
     providers: [
         AuthService,

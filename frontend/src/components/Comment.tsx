@@ -1,12 +1,12 @@
+import commentApis from '@/apis/comment.api';
+import useTokenStore from '@/store/useTokenStore';
+import { formatDate } from '@/utils/formatDate';
+import _ from 'lodash';
+import { Ellipsis, Heart } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router';
 import CustomAvatar from './CustomAvatar';
 import CustomInput from './CustomInput';
-import { formatDate } from '@/utils/formatDate';
-import { Ellipsis, Heart } from 'lucide-react';
-import commentApis from '@/apis/comment.api';
-import _ from 'lodash';
-import { useNavigate } from 'react-router';
-import useTokenStore from '@/store/useTokenStore';
 
 const Comment = ({
     comment,
@@ -17,7 +17,6 @@ const Comment = ({
     modifyChildren,
     parentComment,
     setParentComents = () => {},
-    setShowModal,
 }: {
     comment: CustomComment;
     postedComments?: CustomComment[];
@@ -27,7 +26,6 @@ const Comment = ({
     modifyChildren?: React.Dispatch<React.SetStateAction<CustomComment[]>>;
     parentComment?: CustomComment;
     setParentComents?: React.Dispatch<React.SetStateAction<CustomComment[]>>;
-    setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
     const [isLike, setIsLike] = useState(false);
     const [childComments, setChildComments] = useState<CustomComment[]>(postedComments);
@@ -83,6 +81,8 @@ const Comment = ({
         setParentCommentId(comment.parent_comment_id ?? comment.id);
     };
 
+    console.log(formatDate(comment.created_at))
+
     return (
         <>
             <div>
@@ -92,7 +92,6 @@ const Comment = ({
                         username={comment.user.username}
                         avatar_url={comment.user.avatar_url}
                         onClick={() => {
-                            setShowModal(false);
                             navigate(`/${comment.user.username}`);
                         }}
                     />
@@ -102,7 +101,6 @@ const Comment = ({
                             <p
                                 className="font-semibold cursor-pointer"
                                 onClick={() => {
-                                    setShowModal(false);
                                     navigate(`/${comment.user.username}`);
                                 }}
                             >
@@ -147,7 +145,6 @@ const Comment = ({
                                         setParentCommentId={setParentCommentId}
                                         modifyChildren={setChildComments}
                                         parentComment={comment}
-                                        setShowModal={setShowModal}
                                     />
                                 ))}
                             </div>

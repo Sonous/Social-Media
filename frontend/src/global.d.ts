@@ -90,7 +90,6 @@ declare type CustomComment = Time & {
     user: User;
 };
 
-
 declare type Room = Time & {
     id: string;
     name: string | null;
@@ -99,12 +98,12 @@ declare type Room = Time & {
     roomUsers?: RoomUser[];
     messages?: Message[];
     latestMessage?: Message;
-}
+};
 
 declare type RoomUser = {
     user_id: string;
-    user: User
-}
+    user: User;
+};
 
 declare type Message = Time & {
     id: string;
@@ -112,8 +111,9 @@ declare type Message = Time & {
     medias?: MediaType[] | null;
     user_id: string;
     room_id: string;
-    sender: User
-}
+    sender: User;
+    status: 'sent' | 'read';
+};
 
 declare type Notification = {
     id: string;
@@ -121,7 +121,7 @@ declare type Notification = {
     is_read: boolean;
     user_id: string;
     created_at: string;
-}
+};
 
 type FolderType = 'avatars' | 'posts';
 

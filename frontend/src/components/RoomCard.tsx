@@ -3,11 +3,13 @@ import CustomAvatar from './CustomAvatar';
 import { useNavigate } from 'react-router';
 import { io } from 'socket.io-client';
 import useTokenStore from '@/store/useTokenStore';
+import axiosInstance from '@/configs/axios.config';
 
 const RoomCard = ({ room }: { room: Room }) => {
     const user = useTokenStore((state) => state.user as User);
     const navigate = useNavigate();
     const [latestMessage, setLatestMessage] = useState<Message | undefined>(room.latestMessage);
+    const token = useTokenStore(state => state.token)
 
     function showAvatar() {
         if (room.type === 'private') {
@@ -24,8 +26,12 @@ const RoomCard = ({ room }: { room: Room }) => {
     }
 
     useEffect(() => {
-        console.log(import.meta.env.VITE_SOCKET_URL);
-        const socket = io(import.meta.env.VITE_SOCKET_URL);
+        axiosInstance.get('/').then(res => console.log(res.data))
+        const socket = io(import.meta.env.VITE_SOCKET_URL, {
+            extraHeaders: {
+                Authorization: `Bearer ${token}`,
+            }
+        });
 
         socket.emit('join-room', {
             room_id: room.id,
@@ -39,7 +45,11 @@ const RoomCard = ({ room }: { room: Room }) => {
         socket.on('exception', (error) => {
             console.log('Server exception:', error);
         });
-    }, []);
+
+        return () => {
+            socket.close();
+        }
+    }, [token]);
 
     return (
         <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate(`/inbox/${room.id}`)}>

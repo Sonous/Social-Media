@@ -2,7 +2,6 @@ import CreateDialog from '@/components/create_post/CreateDialog';
 import CustomAvatar from '@/components/CustomAvatar';
 import NavItem from '@/components/NavItem';
 import NotificationModal from '@/components/NotificationModal';
-import Post from '@/components/Post';
 import SearchModal from '@/components/SearchModal';
 import { Button } from '@/components/ui/button';
 import {
@@ -12,10 +11,9 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { PostModalContext } from '@/context/PostModalProvider';
 import useTokenStore from '@/store/useTokenStore';
 import { AlignJustify, Bell, Bookmark, House, Search, Send, Settings2, SquarePlus } from 'lucide-react';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router';
 
 const initNavItem: NavItem[] = [
@@ -50,11 +48,9 @@ const initNavItem: NavItem[] = [
 
 function MainLayout() {
     const [navItems, setNavItems] = useState(initNavItem);
-    // const [isLoading, setIsLoading] = useState(false);
     const [showCreateDialog, setShowCreateDialog] = useState(false);
     const user = useTokenStore((state) => state.user);
     const { clearToken } = useTokenStore();
-    const { isOpenPostModal, post } = useContext(PostModalContext);
     const [miniPopup, setMiniPopup] = useState<MiniPopupState>('none');
     const asideRef = useRef<HTMLDivElement | null>(null);
 
@@ -162,14 +158,6 @@ function MainLayout() {
                                 )}
                             </div>
 
-                            {/* TODO: Sử dụng shadcn component menu cho cái này */}
-                            {/* <Popover>
-                                <PopoverTrigger>
-                                    
-                                </PopoverTrigger>
-                                <PopoverContent></PopoverContent>
-                            </Popover> */}
-
                             <DropdownMenu>
                                 <DropdownMenuTrigger>
                                     <NavItem iconElement={<AlignJustify />} label="More" miniPopup={miniPopup} />
@@ -197,7 +185,9 @@ function MainLayout() {
                                             variant={'ghost'}
                                             onClick={() => {
                                                 clearToken();
-                                                navigate('/login');
+                                                navigate('/login', {
+                                                    replace: true,
+                                                });
                                             }}
                                         >
                                             Logout
@@ -223,7 +213,6 @@ function MainLayout() {
 
                 {showCreateDialog && <CreateDialog setShowCreateDialog={setShowCreateDialog} />}
 
-                {isOpenPostModal && <Post type="modal" post={post as Post} />}
             </main>
         </div>
     );

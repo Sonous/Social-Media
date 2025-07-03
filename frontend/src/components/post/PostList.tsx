@@ -1,7 +1,8 @@
 import React, { useEffect, useRef } from 'react';
-import { Loading } from './Loading';
-import Post from './Post';
+import { Loading } from '../Loading';
+import Post from '../Post';
 import { useInView } from 'motion/react';
+import SimplePost from './MiniPost';
 
 const PostList = ({
     posts,
@@ -46,7 +47,7 @@ const PostList = ({
             {posts.length > 0 && (
                 <div className="grid grid-cols-3 gap-2 px-2">
                     {posts.map((post) => (
-                        <Post key={post.id} type="simple" post={post} />
+                        <SimplePost key={post.id} post={post} />
                     ))}
                 </div>
             )}

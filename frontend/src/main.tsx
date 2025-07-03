@@ -1,16 +1,14 @@
 import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App.tsx';
-import './index.css';
-import { Toaster } from './components/ui/toaster.tsx';
-import { Loading } from './components/Loading.tsx';
-import PostModalProvider from './context/PostModalProvider.tsx';
-import { TooltipProvider } from './components/ui/tooltip.tsx';
 import { ToastContainer } from 'react-toastify';
+import App from './App.tsx';
+import { Loading } from './components/Loading.tsx';
+import { Toaster } from './components/ui/toaster.tsx';
+import { TooltipProvider } from './components/ui/tooltip.tsx';
+import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
-        <PostModalProvider>
             <TooltipProvider>
                 <Suspense fallback={<Loading />}>
                     <App />
@@ -18,6 +16,5 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                     <ToastContainer />
                 </Suspense>
             </TooltipProvider>
-        </PostModalProvider>
     </React.StrictMode>,
 );

@@ -2,27 +2,29 @@ import roomApis from '@/apis/room.api';
 import CustomAvatar from '@/components/CustomAvatar';
 import CustomInput from '@/components/CustomInput';
 import Message from '@/components/Message';
+import axiosInstance from '@/configs/axios.config';
 import useTokenStore from '@/store/useTokenStore';
 import { uniqueArr } from '@/utils/uniqueArr';
+import { ChevronLeft } from 'lucide-react';
+import { motion } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
-import {  useParams } from 'react-router';
+import { useParams } from 'react-router';
 import { io, Socket } from 'socket.io-client';
 
 const ChatRoom = () => {
     const { roomId } = useParams();
     const [room, setRoom] = useState<Room | undefined>();
     const [messages, setMessages] = useState<Message[]>([]);
-    const user = useTokenStore(state => state.user as User);
+    const user = useTokenStore((state) => state.user as User);
     const [messageInput, setMessageInput] = useState('');
-    const [socket, setSocket] = useState<Socket>();
     const divRef = useRef<HTMLDivElement | null>(null);
+    const socketRef = useRef<Socket>();
 
     useEffect(() => {
-      if (divRef.current) {
-        divRef.current.scrollTop = divRef.current.scrollHeight;
-      }
+        if (divRef.current) {
+            divRef.current.scrollTop = divRef.current.scrollHeight;
+        }
     }, [messages]);
-
 
     function showAvatar(className?: string) {
         if (room?.type === 'private') {
@@ -63,16 +65,23 @@ const ChatRoom = () => {
     }, [roomId]);
 
     useEffect(() => {
-        if (roomId && user.id) {
-            const socket = io(import.meta.env.VITE_SOCKET_URL);
+        axiosInstance.get('/');
+        socketRef.current = io(import.meta.env.VITE_SOCKET_URL, {
+            extraHeaders: {
+                Authorization: `Bearer ${useTokenStore.getState().token}`,
+            },
+        });
 
+        const socket = socketRef.current;
+
+        if (roomId && user.id) {
             socket.emit(
                 'join-room',
                 {
                     room_id: roomId,
                     user_id: user.id,
                 },
-                (res: { message: string}) => {
+                (res: { message: string }) => {
                     console.log(res);
                 },
             );
@@ -81,33 +90,54 @@ const ChatRoom = () => {
                 setMessages((prev) => uniqueArr([...prev, data]));
             });
 
-            setSocket(socket);
+            socket.on('exception', (error) => {
+                console.log('Server exception:', error);
+            });
         }
         return () => {
-            if (socket) socket.close();
+            socket.close();
         };
     }, [roomId, user]);
 
     const handleSendMessage = async () => {
-        if (socket) {
-            socket.emit(
-                'send-message',
-                {
-                    content: messageInput,
-                    user_id: user.id,
-                    room_id: roomId,
-                },
-                (res: { message: string; data?: Message }) => {
-                    console.log(res)
-                    setMessageInput('');
-                },
-            );
+        const socket = socketRef.current;
+
+        if (!socket) {
+            console.error('Socket is not initialized');
+            return;
+        }
+
+        try {
+            axiosInstance.get('/');
+            const res = await socket.emitWithAck('send-message', {
+                content: messageInput,
+                user_id: user.id,
+                room_id: roomId,
+            });
+
+            console.log('Response from server:', res);
+            setMessageInput('');
+        } catch (error) {
+            console.error('Error sending message:', error);
         }
     };
 
     return (
         <div className="p-5 flex flex-col h-full">
-            <section className="border-b-[1px] pb-3">
+            <section className="border-b-[1px] pb-3 flex items-center gap-3">
+                <motion.div
+                    whileHover={{
+                        x: -5,
+                        transition: { duration: 0.2 },
+                    }}
+                >
+                    <ChevronLeft
+                        className="cursor-pointer"
+                        onClick={() => {
+                            window.history.back();
+                        }}
+                    />
+                </motion.div>
                 <div className="flex gap-3 items-center">
                     {showAvatar()}
                     <h1 className="font-semibold">{showRoomName()}</h1>

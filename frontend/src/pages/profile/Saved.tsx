@@ -1,5 +1,5 @@
 import savedApis from '@/apis/saved.api';
-import PostList from '@/components/PostList';
+import PostList from '@/components/post/PostList';
 import { useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router';
 

@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
 import postApis from '@/apis/posts.api';
-import Post from '@/components/Post';
+import MediumPost from '@/components/post/MediumPost';
 import { CirclePlus } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 function Home() {
     const [posts, setPosts] = useState<Post[]>([]);
@@ -33,12 +33,12 @@ function Home() {
     return (
         <div className="flex-center flex-col gap-5">
             {posts.map((post, index) => (
-                <Post key={index} type="normal" post={post} />
+                <MediumPost key={index} post={post} className="max-w-[400px] md:max-w-[600px] lg:max-w-[700px]" />
             ))}
-            
+
             {showPlusButton && (
                 <div className="p-5">
-                    <CirclePlus className='cursor-pointer' onClick={fetchPosts} />
+                    <CirclePlus className="cursor-pointer" onClick={fetchPosts} />
                 </div>
             )}
         </div>

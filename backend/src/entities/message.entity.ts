@@ -24,6 +24,14 @@ export class Messages extends Time {
     })
     medias: MediaType[];
 
+    @Column({
+        name: 'status',
+        enum: ['sent', 'read'],
+        default: 'sent',
+        type: 'enum',
+    })
+    status: 'sent' | 'read';
+
     @Column()
     user_id: string;
 
