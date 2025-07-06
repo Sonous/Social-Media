@@ -112,7 +112,7 @@ declare type Message = Time & {
     user_id: string;
     room_id: string;
     sender: User;
-    status: 'sent' | 'read';
+    status: 'sent' | 'read' | 'recovery';
 };
 
 declare type Notification = {

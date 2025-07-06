@@ -5,8 +5,8 @@ export default function MiniPost({ post }: { post: Post }) {
     const [isOpenPostModal, setIsOpenPostModal] = useState(false);
 
     return (
-        <div>
-            <div key={post.id} onClick={() => setIsOpenPostModal(true)} className="cursor-pointer">
+        <>
+            <div key={post.id} onClick={() => setIsOpenPostModal(true)} className="cursor-pointer h-full w-full">
                 {post.medias[0].type === 'image' ? (
                     <img
                         src={post.medias[0].url}
@@ -20,6 +20,6 @@ export default function MiniPost({ post }: { post: Post }) {
                 )}
             </div>
             <PostModal post={post} isOpen={isOpenPostModal} setIsOpen={setIsOpenPostModal} />
-        </div>
+        </>
     );
 }

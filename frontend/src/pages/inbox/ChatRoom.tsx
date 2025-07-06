@@ -4,10 +4,11 @@ import CustomInput from '@/components/CustomInput';
 import Message from '@/components/Message';
 import axiosInstance from '@/configs/axios.config';
 import useTokenStore from '@/store/useTokenStore';
+import { formatDate } from '@/utils/formatDate';
 import { uniqueArr } from '@/utils/uniqueArr';
 import { ChevronLeft } from 'lucide-react';
 import { motion } from 'motion/react';
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router';
 import { io, Socket } from 'socket.io-client';
 
@@ -90,6 +91,19 @@ const ChatRoom = () => {
                 setMessages((prev) => uniqueArr([...prev, data]));
             });
 
+            socket.on('recovery-message', (data) => {
+                setMessages((prev) =>
+                    prev.map((msg) =>
+                        msg.id === data.id
+                            ? {
+                                  ...msg,
+                                  status: 'recovery',
+                              }
+                            : msg,
+                    ),
+                );
+            });
+
             socket.on('exception', (error) => {
                 console.log('Server exception:', error);
             });
@@ -122,6 +136,24 @@ const ChatRoom = () => {
         }
     };
 
+    const handleRecoveryMessage = async (messageId: string, userId: string) => {
+        const socket = socketRef.current;
+
+        if (!socket) {
+            console.error('Socket is not initialized');
+            return;
+        }
+
+        try {
+            await socket.emitWithAck('recovery-message', {
+                message_id: messageId,
+                user_id: userId,
+            });
+        } catch (error) {
+            console.error('Error recovering message:', error);
+        }
+    };
+
     return (
         <div className="p-5 flex flex-col h-full">
             <section className="border-b-[1px] pb-3 flex items-center gap-3">
@@ -140,7 +172,10 @@ const ChatRoom = () => {
                 </motion.div>
                 <div className="flex gap-3 items-center">
                     {showAvatar()}
-                    <h1 className="font-semibold">{showRoomName()}</h1>
+                    <div>
+                        <h1 className="font-semibold">{showRoomName()}</h1>
+                        <span>{}</span>
+                    </div>
                 </div>
             </section>
 
@@ -150,9 +185,24 @@ const ChatRoom = () => {
                     <h1>{showRoomName()}</h1>
                 </div>
 
-                {messages.map((message) => (
-                    <Message message={message} key={message.id} />
-                ))}
+                {messages.map((message, index) => {
+                    const currentTime = new Date(message.created_at);
+                    const nextTime = messages[index + 1]?.created_at ? new Date(messages[index + 1].created_at) : null;
+
+                    const isShowTime = nextTime && nextTime.getTime() - currentTime.getTime() > 1000 * 60 * 60 * 2; // cách nhau > 2h
+
+                    return (
+                        <React.Fragment key={message.id}>
+                            <Message message={message} handleRecoveryMessage={handleRecoveryMessage} />
+
+                            {isShowTime && (
+                                <div className="text-center py-4 text-sm text-gray-500">
+                                    {formatDate(nextTime.toString())}
+                                </div>
+                            )}
+                        </React.Fragment>
+                    );
+                })}
             </section>
 
             <section className="input border-2 rounded-3xl flex items-center px-3">

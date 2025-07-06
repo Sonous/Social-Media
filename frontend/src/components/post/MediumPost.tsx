@@ -1,22 +1,29 @@
+import postApis from '@/apis/posts.api';
+import savedApis from '@/apis/saved.api';
+import userApis from '@/apis/users.api';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { useToast } from '@/hooks/use-toast';
+import useDebounce from '@/hooks/useDebounce';
+import useTokenStore from '@/store/useTokenStore';
 import { formatDate } from '@/utils/formatDate';
-import { Bookmark, Heart, MessageCircle, Settings2 } from 'lucide-react';
+import { Bookmark, Ellipsis, Heart, MessageCircle } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
 import CustomAvatar from '../CustomAvatar';
 import CustomInput from '../CustomInput';
 import MediasCarousel from '../create_post/MediasCarousel';
-import { useEffect, useState } from 'react';
-import userApis from '@/apis/users.api';
-import { useNavigate } from 'react-router';
-import postApis from '@/apis/posts.api';
-import savedApis from '@/apis/saved.api';
-import useTokenStore from '@/store/useTokenStore';
-import useDebounce from '@/hooks/useDebounce';
 import PostModal from './PostModal';
 
 export default function MediumPost({
     children,
     post,
     className,
-    type = 'none'
+    type = 'none',
 }: {
     children?: React.ReactNode;
     post: Post;
@@ -30,6 +37,7 @@ export default function MediumPost({
     const [firstMount, setFirstMount] = useState(true);
     const [isOpenPostModal, setIsOpenPostModal] = useState(false);
     const user = useTokenStore((state) => state.user as User);
+    const { toast } = useToast();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -156,7 +164,38 @@ export default function MediumPost({
                                 </div>
                             </div>
                             <div>
-                                <Settings2 strokeWidth={1} />
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger>
+                                        <Ellipsis size={20} color="#000000" />
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent>
+                                        <DropdownMenuItem
+                                            onClick={() => {
+                                                navigate(`/${postOwner.username}`);
+                                            }}
+                                        >
+                                            About this account
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem>Go to post</DropdownMenuItem>
+                                        {post.user_id === user.id && (
+                                            <DropdownMenuItem
+                                                onClick={async () => {
+                                                    try {
+                                                        await postApis.deletePost(post.id);
+
+                                                        toast({
+                                                            title: 'Delete post successfully',
+                                                        });
+                                                    } catch (error) {
+                                                        console.log('Delete post error:', error);
+                                                    }
+                                                }}
+                                            >
+                                                Delete post
+                                            </DropdownMenuItem>
+                                        )}
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                             </div>
                         </div>
 
@@ -193,12 +232,12 @@ export default function MediumPost({
                                         className="cursor-pointer"
                                         onClick={() => {
                                             if (type === 'none') {
-                                                setIsOpenPostModal(true)
+                                                setIsOpenPostModal(true);
                                             }
                                         }}
                                     />
                                     <p>{currentWorkPost.commentAmount}</p>
-                                    <PostModal post={post} isOpen={isOpenPostModal} setIsOpen={setIsOpenPostModal}/>
+                                    <PostModal post={post} isOpen={isOpenPostModal} setIsOpen={setIsOpenPostModal} />
                                 </div>
                             </div>
                             <Bookmark

@@ -192,4 +192,25 @@ export class ChatsService {
             .orderBy('message.created_at', 'DESC')
             .getOne();
     }
+
+    async verifyMessageOwnership(messageId: string, userId: string) {
+        const message = await this.messagesRepository.findOneBy({ id: messageId });
+
+        if (!message) {
+            throw new NotFoundException('Message not found');
+        }
+
+        if (message.user_id !== userId) {
+            throw new BadRequestException('You do not have permission to perform this action');
+        }
+
+        return message;
+    }
+
+    async updateMessageStatus(messageId: string, status: 'sent' | 'read' | 'recovery') {
+        const message = await this.messagesRepository.findOneBy({ id: messageId });
+
+        message.status = status;
+        return await this.messagesRepository.save(message);
+    }
 }

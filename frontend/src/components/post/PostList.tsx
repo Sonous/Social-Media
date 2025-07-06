@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from 'react';
 import { Loading } from '../Loading';
-import Post from '../Post';
 import { useInView } from 'motion/react';
 import SimplePost from './MiniPost';
 
@@ -20,27 +19,6 @@ const PostList = ({
     useEffect(() => {
         setIsVisible(inView);
     }, [inView]);
-
-    // useEffect(() => {
-    //     const observer = new IntersectionObserver(
-    //         ([entry]) => {
-    //             setIsVisible(entry.isIntersecting);
-    //         },
-    //         {
-    //             threshold: 1,
-    //         },
-    //     );
-
-    //     if (loadingRef.current) {
-    //         observer.observe(loadingRef.current);
-    //     }
-
-    //     return () => {
-    //         if (loadingRef.current) {
-    //             observer.unobserve(loadingRef.current);
-    //         }
-    //     };
-    // }, [loadingRef]);
 
     return (
         <>

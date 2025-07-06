@@ -21,6 +21,10 @@ const postApis = {
         });
     },
 
+    deletePost(id: string) {
+        return axiosInstance.delete(`/posts/${id}`);
+    },
+
     async addInteraction(post_id: string, user_id: string) {
         await axiosInstance.post(
             '/posts/interactions',

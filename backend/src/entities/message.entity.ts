@@ -26,11 +26,11 @@ export class Messages extends Time {
 
     @Column({
         name: 'status',
-        enum: ['sent', 'read'],
+        enum: ['sent', 'read', 'recovery'],
         default: 'sent',
         type: 'enum',
     })
-    status: 'sent' | 'read';
+    status: 'sent' | 'read' | 'recovery';
 
     @Column()
     user_id: string;

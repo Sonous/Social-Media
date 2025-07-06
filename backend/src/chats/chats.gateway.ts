@@ -14,6 +14,7 @@ import { ChatsService } from './chats.service';
 import { CreateMessageDto } from './dtos/create-message.dto';
 import { JoinRoomDto } from './dtos/join-room.dto';
 import { SocketGuard } from './socket.guard';
+import { RecoveryMessageDto } from './dtos/recovery-message.dto';
 
 @UsePipes(
     new ValidationPipe({
@@ -65,6 +66,25 @@ export class ChatGateWay {
             };
         } catch (error) {
             client.leave(message.room_id);
+            throw new WsException({
+                message: error.message || 'An error occurred while sending the message',
+                statusCode: 400,
+            });
+        }
+    }
+
+    @SubscribeMessage('recovery-message')
+    async handleRecoveryMessage(@MessageBody() recoveryMessageDto: RecoveryMessageDto) {
+        try {
+            const message = await this.chatsService.verifyMessageOwnership(
+                recoveryMessageDto.message_id,
+                recoveryMessageDto.user_id,
+            );
+
+            const updatedMessage = await this.chatsService.updateMessageStatus(message.id, 'recovery');
+
+            this.server.to(message.room_id).emit('recovery-message', updatedMessage);
+        } catch (error) {
             throw new WsException({
                 message: error.message || 'An error occurred while sending the message',
                 statusCode: 400,

@@ -81,8 +81,6 @@ const Comment = ({
         setParentCommentId(comment.parent_comment_id ?? comment.id);
     };
 
-    console.log(formatDate(comment.created_at))
-
     return (
         <>
             <div>

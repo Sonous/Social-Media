@@ -1,7 +1,8 @@
-import { BadRequestException, Body, Controller, Delete, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
-import { PostsService } from './posts.service';
-import { CreatePostDto } from './dtos/create-post.dto';
+import { BadRequestException, Body, Controller, Delete, Get, Param, Post, Query, Req } from '@nestjs/common';
+import { Request } from 'express';
 import { CreateInteractionDto } from './dtos/create-interaction.dto';
+import { CreatePostDto } from './dtos/create-post.dto';
+import { PostsService } from './posts.service';
 
 @Controller('posts')
 export class PostsController {
@@ -47,5 +48,10 @@ export class PostsController {
     @Get(':id')
     async getPostById(@Param('id') id: string) {
         return await this.postsService.getPostById(id);
+    }
+
+    @Delete(':id')
+    async deletePost(@Param('id') id: string, @Req() req: Request) {
+        return await this.postsService.deletePost(id, req['user'].id);
     }
 }

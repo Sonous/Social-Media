@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { Post } from './post.interface';
 import { HashtagsService } from 'src/hashtags/hashtags.service';
 import { DEFAULT_LIMIT, DEFAULT_OFFSET } from 'src/constants';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class PostsService {
@@ -14,6 +15,7 @@ export class PostsService {
     constructor(
         @InjectRepository(Posts) private postsRepository: Repository<Posts>,
         private hashtagsService: HashtagsService,
+        private usersService: UsersService,
     ) {}
 
     async addPost(post: Post) {
@@ -226,5 +228,20 @@ export class PostsService {
                 isExists: true,
             };
         }
+    }
+
+    async deletePost(id: string, userId: string) {
+        const post = await this.postsRepository.findOneBy({ id });
+        const user = await this.usersService.getUserById(userId);
+
+        if (!post) {
+            throw new NotFoundException('Post not found');
+        }
+
+        if (post.user_id !== user.id) {
+            throw new ConflictException('You are not the owner of this post');
+        }
+
+        return await this.postsRepository.delete({ id });
     }
 }

@@ -198,7 +198,7 @@ function MainLayout() {
                         </div>
                     </aside>
                     <div
-                        className={`absolute sm:left-[100%] z-20 bg-white transition-all duration-300 sm:rounded-r-xl shadow-[4px_0_12px_-2px_rgba(0,0,0,0.4)] flex flex-col overflow-hidden w-full h-full ${
+                        className={`absolute max-sm:bottom-[100%] sm:left-[100%] z-20 bg-white transition-all duration-300 sm:rounded-r-xl sm:shadow-[4px_0_12px_-2px_rgba(0,0,0,0.4)] rounded-t-xl shadow-[0_-4px_12px_-2px_rgba(0,0,0,0.4)] flex flex-col overflow-hidden w-full h-full ${
                             miniPopup === 'none' ? 'sm:w-0 max-sm:h-0' : 'lg:w-[400px] sm:w-[300px]  max-sm:h-[400px]'
                         }`}
                     >
