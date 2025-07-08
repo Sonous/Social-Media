@@ -6,6 +6,7 @@ import { Post } from './post.interface';
 import { HashtagsService } from 'src/hashtags/hashtags.service';
 import { DEFAULT_LIMIT, DEFAULT_OFFSET } from 'src/constants';
 import { UsersService } from 'src/users/users.service';
+import { NotificationService } from 'src/notification/notification.service';
 
 @Injectable()
 export class PostsService {
@@ -16,6 +17,7 @@ export class PostsService {
         @InjectRepository(Posts) private postsRepository: Repository<Posts>,
         private hashtagsService: HashtagsService,
         private usersService: UsersService,
+        private notificationService: NotificationService,
     ) {}
 
     async addPost(post: Post) {
@@ -67,6 +69,29 @@ export class PostsService {
                 .relation(Posts, 'hashtags')
                 .of(postId)
                 .add(hashtag.id);
+        }
+
+        // Notification to the followers
+        let page = 1;
+        const owner = await this.usersService.getUserById(post.user_id);
+        while (true) {
+            const result = await this.usersService.getFollowersOfUser(post.user_id, page);
+
+            if (result.followers.length === 0) {
+                break;
+            }
+
+            const receiverIds = result.followers.map((follower) => follower.id);
+            await this.notificationService.createNofification(
+                `${owner.username} has posted a new post`,
+                'post',
+                owner,
+                receiverIds,
+                {
+                    postId,
+                },
+            );
+            page++;
         }
 
         return {

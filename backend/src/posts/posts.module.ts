@@ -6,6 +6,7 @@ import { Posts } from 'src/entities/post.entity';
 import { HashtagsModule } from 'src/hashtags/hashtags.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { UsersModule } from 'src/users/users.module';
+import { NotificationModule } from 'src/notification/notification.module';
 
 @Module({
     imports: [
@@ -13,6 +14,7 @@ import { UsersModule } from 'src/users/users.module';
         forwardRef(() => HashtagsModule),
         forwardRef(() => AuthModule),
         UsersModule,
+        NotificationModule,
     ],
     exports: [PostsService],
     controllers: [PostsController],

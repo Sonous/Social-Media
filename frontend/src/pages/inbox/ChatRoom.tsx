@@ -66,50 +66,52 @@ const ChatRoom = () => {
     }, [roomId]);
 
     useEffect(() => {
-        axiosInstance.get('/');
-        socketRef.current = io(import.meta.env.VITE_SOCKET_URL, {
-            extraHeaders: {
-                Authorization: `Bearer ${useTokenStore.getState().token}`,
-            },
+        axiosInstance.get('/').then(() => {
+            socketRef.current = io(import.meta.env.VITE_SOCKET_URL, {
+                extraHeaders: {
+                    Authorization: `Bearer ${useTokenStore.getState().token}`,
+                },
+            });
+
+            const socket = socketRef.current;
+
+            if (roomId && user.id) {
+                socket.emit(
+                    'join-room',
+                    {
+                        room_id: roomId,
+                        user_id: user.id,
+                    },
+                    (res: { message: string }) => {
+                        console.log(res);
+                    },
+                );
+
+                socket.on('new-message', (data) => {
+                    setMessages((prev) => uniqueArr([...prev, data]));
+                });
+
+                socket.on('recovery-message', (data) => {
+                    setMessages((prev) =>
+                        prev.map((msg) =>
+                            msg.id === data.id
+                                ? {
+                                      ...msg,
+                                      status: 'recovery',
+                                  }
+                                : msg,
+                        ),
+                    );
+                });
+
+                socket.on('exception', (error) => {
+                    console.log('Server exception:', error);
+                });
+            }
         });
 
-        const socket = socketRef.current;
-
-        if (roomId && user.id) {
-            socket.emit(
-                'join-room',
-                {
-                    room_id: roomId,
-                    user_id: user.id,
-                },
-                (res: { message: string }) => {
-                    console.log(res);
-                },
-            );
-
-            socket.on('new-message', (data) => {
-                setMessages((prev) => uniqueArr([...prev, data]));
-            });
-
-            socket.on('recovery-message', (data) => {
-                setMessages((prev) =>
-                    prev.map((msg) =>
-                        msg.id === data.id
-                            ? {
-                                  ...msg,
-                                  status: 'recovery',
-                              }
-                            : msg,
-                    ),
-                );
-            });
-
-            socket.on('exception', (error) => {
-                console.log('Server exception:', error);
-            });
-        }
         return () => {
-            socket.close();
+            socketRef.current?.close();
         };
     }, [roomId, user]);
 

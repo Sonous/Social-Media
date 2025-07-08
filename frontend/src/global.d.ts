@@ -115,12 +115,17 @@ declare type Message = Time & {
     status: 'sent' | 'read' | 'recovery';
 };
 
-declare type Notification = {
+declare type CustomNotification = {
     id: string;
-    content: string;
-    is_read: boolean;
-    user_id: string;
-    created_at: string;
+    isRead: boolean;
+    notification: {
+        id: string;
+        content: string;
+        type: 'follow' | 'like' | 'comment' | 'post';
+        sender: User;
+        meta?: Record<string, unknown>;
+        created_at: string;
+    };
 };
 
 type FolderType = 'avatars' | 'posts';
@@ -133,3 +138,9 @@ type TokenPayload = {
 };
 
 type MiniPopupState = 'search' | 'notification' | 'none';
+
+type Pageable<T> = {
+    data: T[];
+    limit: number;
+    totalPage: number;
+}

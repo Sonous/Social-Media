@@ -4,11 +4,12 @@ import { UsersService } from './users.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Users } from '../entities/user.entity';
 import { AuthModule } from 'src/auth/auth.module';
+import { NotificationModule } from 'src/notification/notification.module';
 // import { PostsModule } from 'src/posts/posts.module';
 // import { SavedModule } from 'src/saved/saved.module';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Users]), forwardRef(() => AuthModule)],
+    imports: [TypeOrmModule.forFeature([Users]), forwardRef(() => AuthModule), forwardRef(() => NotificationModule)],
     exports: [TypeOrmModule, UsersService],
     controllers: [UsersController],
     providers: [UsersService],

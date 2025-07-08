@@ -2,8 +2,6 @@ import { UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import {
     ConnectedSocket,
     MessageBody,
-    // OnGatewayConnection,
-    // OnGatewayDisconnect,
     SubscribeMessage,
     WebSocketGateway,
     WebSocketServer,

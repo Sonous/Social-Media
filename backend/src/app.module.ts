@@ -23,6 +23,9 @@ import { RoomsUsers } from './entities/roomsUsers.entity';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { parse } from 'pg-connection-string';
 import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
+import { NotificationModule } from './notification/notification.module';
+import { Notification } from './entities/notification.entity';
+import { NotificationUser } from './entities/notification-user.entity';
 
 @Module({
     imports: [
@@ -40,7 +43,19 @@ import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
                     password: config.password,
                     database: config.database,
                     ssl: { rejectUnauthorized: false },
-                    entities: [Users, Time, Posts, Hashtags, Saved, Comments, Rooms, Messages, RoomsUsers],
+                    entities: [
+                        Users,
+                        Time,
+                        Posts,
+                        Hashtags,
+                        Saved,
+                        Comments,
+                        Rooms,
+                        Messages,
+                        RoomsUsers,
+                        Notification,
+                        NotificationUser,
+                    ],
                 };
             },
         }),
@@ -56,6 +71,7 @@ import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
         CommentsModule,
         ChatsModule,
         CloudinaryModule,
+        NotificationModule,
     ],
     controllers: [AppController],
     providers: [

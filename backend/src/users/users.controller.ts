@@ -1,8 +1,8 @@
-import { BadRequestException, Body, Controller, Delete, Get, Param, Post, Put, Query, Request } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
+import { Public } from 'src/auth/public.decorator';
+import { CreateRelationDto } from './dtos/create-relation.dto';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UsersService } from './users.service';
-import { CreateRelationDto } from './dtos/create-relation.dto';
-import { Public } from 'src/auth/public.decorator';
 
 @Controller('users')
 export class UsersController {
@@ -73,6 +73,14 @@ export class UsersController {
     @Get('search')
     async searchUsers(@Query('searchString') searchString: string) {
         return this.usersService.searchUsers(searchString);
+    }
+
+    @Get('followers/:id')
+    @Public()
+    async getFollowersOfUser(@Param('id') id: string, @Query('page') page: number) {
+        if (!page) throw new BadRequestException('Page is required');
+        if (page < 1) throw new BadRequestException('Page must be greater than 0');
+        return await this.usersService.getFollowersOfUser(id, page);
     }
 
     @Get(':id')

@@ -2,10 +2,11 @@ import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/commo
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuthService } from 'src/auth/auth.service';
 import { Users } from 'src/entities/user.entity';
-import { Brackets, Repository } from 'typeorm';
+import { Brackets, DataSource, Repository } from 'typeorm';
 import { UserInterface } from './interfaces/user.interface';
 // import { PostsService } from 'src/posts/posts.service';
 import { DEFAULT_LIMIT, DEFAULT_OFFSET } from 'src/constants';
+import { NotificationService } from 'src/notification/notification.service';
 
 type ValidateUsername = {
     isValid: boolean;
@@ -20,7 +21,8 @@ export class UsersService {
     constructor(
         @InjectRepository(Users) private usersRepository: Repository<Users>,
         @Inject(forwardRef(() => AuthService)) private readonly authService: AuthService,
-        // private postsService: PostsService,
+        @Inject(forwardRef(() => NotificationService)) private notificationService: NotificationService,
+        private dataSource: DataSource,
     ) {}
 
     async validateUsername(username: string): Promise<ValidateUsername> {
@@ -124,23 +126,14 @@ export class UsersService {
         const offset = page * this.defautlOffset - this.defautlOffset;
         const limit = this.defautlLimit;
 
-        const user = await this.usersRepository
-            .createQueryBuilder('user')
-            .where('user.id = :currentUserId', { currentUserId })
-            .getOne();
-
-        if (!user) {
-            throw new NotFoundException('Current user not found');
-        }
-
         const userRelations = await this.usersRepository
             .createQueryBuilder('user')
             .innerJoin(`user.${type}`, type)
             .select([
-                `${type}.id as 'id'`,
-                `${type}.name as 'name'`,
-                `${type}.username as 'username'`,
-                `${type}.avatar_url as 'avatar_url'`,
+                `${type}.id AS id`,
+                `${type}.name AS name`,
+                `${type}.username AS username`,
+                `${type}.avatar_url AS avatar_url`,
             ])
             .where('user.id = :userId', { userId })
             .andWhere(
@@ -171,7 +164,14 @@ export class UsersService {
     }
 
     async addRelation(followerId: string, followingId: string) {
+        const follower = await this.usersRepository.findOneBy({ id: followerId });
         await this.usersRepository.createQueryBuilder().relation(Users, 'following').of(followerId).add(followingId);
+        await this.notificationService.createNofification(
+            `${follower.username} has started following you`,
+            'follow',
+            follower,
+            [followingId],
+        );
     }
 
     async removeRelation(currentUserId: string, otherUserId: string) {
@@ -236,5 +236,24 @@ export class UsersService {
         }
 
         return user;
+    }
+
+    async getFollowersOfUser(userId: string, page: number) {
+        const offset = page * this.defautlOffset - this.defautlOffset;
+        const limit = this.defautlLimit;
+
+        const [followers, total] = await this.usersRepository
+            .createQueryBuilder('user')
+            .innerJoinAndSelect('user.followers', 'followers')
+            .where('user.id = :userId', { userId })
+            .offset(offset)
+            .limit(limit)
+            .getManyAndCount();
+
+        return {
+            followers: followers[0]?.followers || [],
+            pageSize: limit,
+            totalPages: Math.ceil(total / limit),
+        };
     }
 }

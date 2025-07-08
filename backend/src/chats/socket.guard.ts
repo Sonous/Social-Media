@@ -23,7 +23,7 @@ export class SocketGuard implements CanActivate {
 
         try {
             const payload = this.jwtService.verify(token);
-            request['user'] = payload; // attach user to socket if needed
+            request['user'] = payload.user; // attach user to socket if needed
             return true;
         } catch (error) {
             if (error instanceof TokenExpiredError) {

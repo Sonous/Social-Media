@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import CustomAvatar from './CustomAvatar';
 import { useNavigate } from 'react-router';
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 import useTokenStore from '@/store/useTokenStore';
 import axiosInstance from '@/configs/axios.config';
 
@@ -9,7 +9,7 @@ const RoomCard = ({ room }: { room: Room }) => {
     const user = useTokenStore((state) => state.user as User);
     const navigate = useNavigate();
     const [latestMessage, setLatestMessage] = useState<Message | undefined>(room.latestMessage);
-    const token = useTokenStore(state => state.token)
+    const token = useTokenStore((state) => state.token);
 
     function showAvatar() {
         if (room.type === 'private') {
@@ -26,29 +26,32 @@ const RoomCard = ({ room }: { room: Room }) => {
     }
 
     useEffect(() => {
-        axiosInstance.get('/').then(res => console.log(res.data))
-        const socket = io(import.meta.env.VITE_SOCKET_URL, {
-            extraHeaders: {
-                Authorization: `Bearer ${token}`,
-            }
-        });
+        let socket: Socket;
 
-        socket.emit('join-room', {
-            room_id: room.id,
-            user_id: user.id,
-        });
+        axiosInstance.get('/').then(() => {
+            socket = io(import.meta.env.VITE_SOCKET_URL, {
+                extraHeaders: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
 
-        socket.on('new-message', (data) => {
-            setLatestMessage(data);
-        });
+            socket.emit('join-room', {
+                room_id: room.id,
+                user_id: user.id,
+            });
 
-        socket.on('exception', (error) => {
-            console.log('Server exception:', error);
+            socket.on('new-message', (data) => {
+                setLatestMessage(data);
+            });
+
+            socket.on('exception', (error) => {
+                console.log('Server exception:', error);
+            });
         });
 
         return () => {
-            socket.close();
-        }
+            socket?.close();
+        };
     }, [token]);
 
     return (
