@@ -65,7 +65,7 @@ const ChatRoom = () => {
 
     useEffect(() => {
         axiosInstance.get('/').then(() => {
-            socketRef.current = io(import.meta.env.VITE_SOCKET_URL, {
+            socketRef.current = io(import.meta.env.VITE_BACKEND_URL, {
                 extraHeaders: {
                     Authorization: `Bearer ${useTokenStore.getState().token}`,
                 },

@@ -29,7 +29,7 @@ const RoomCard = ({ room }: { room: Room }) => {
         let socket: Socket;
 
         axiosInstance.get('/').then(() => {
-            socket = io(import.meta.env.VITE_SOCKET_URL, {
+            socket = io(import.meta.env.VITE_BACKEND_URL, {
                 extraHeaders: {
                     Authorization: `Bearer ${token}`,
                 },

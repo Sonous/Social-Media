@@ -9,7 +9,7 @@ import { SocketGuard } from 'src/chats/socket.guard';
         exceptionFactory: (errors) => new WsException(errors),
     }),
 )
-@WebSocketGateway(3030, {
+@WebSocketGateway({
     cors: {
         origin: process.env.ORIGIN_CORS || 'http://localhost:5173', // hoặc domain frontend của bạn
         credentials: true,

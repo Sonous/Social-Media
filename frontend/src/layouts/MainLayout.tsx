@@ -106,7 +106,7 @@ function MainLayout() {
 
     useEffect(() => {
         axiosInstance.get('/').then(() => {
-            const socket = io(import.meta.env.VITE_SOCKET_URL || 'http://localhost:3030', {
+            const socket = io(import.meta.env.VITE_BACKEND_URL || 'http://localhost:3030', {
                 extraHeaders: {
                     Authorization: `Bearer ${token}`,
                 },
