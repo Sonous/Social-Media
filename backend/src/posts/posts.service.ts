@@ -103,6 +103,34 @@ export class PostsService {
         return await this.postsRepository.findOneBy({ id });
     }
 
+    async getPostDetailById(id: string) {
+        const post = await this.getPostById(id);
+
+        if (!post) {
+            throw new NotFoundException('Post not found');
+        }
+
+        const likeAmount = await this.postsRepository
+            .createQueryBuilder('post')
+            .leftJoin('post.userInteractions', 'interaction')
+            .select(['COUNT(interaction.id) as likeAmount'])
+            .where('post.id = :id', { id: post.id })
+            .getRawOne();
+
+        const commentAmount = await this.postsRepository
+            .createQueryBuilder('post')
+            .leftJoin('post.comments', 'comment')
+            .select(['COUNT(comment.id) as commentAmount'])
+            .where('post.id = :id', { id: post.id })
+            .getRawOne();
+
+        return {
+            ...post,
+            likeAmount: parseInt(likeAmount.likeAmount),
+            commentAmount: parseInt(commentAmount.commentAmount),
+        };
+    }
+
     async getPostsByUserId(userId: string, page: number) {
         const offset = page * this.defaultOffset - this.defaultOffset;
         const limit = this.defaultLimit;

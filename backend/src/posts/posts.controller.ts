@@ -3,6 +3,7 @@ import { Request } from 'express';
 import { CreateInteractionDto } from './dtos/create-interaction.dto';
 import { CreatePostDto } from './dtos/create-post.dto';
 import { PostsService } from './posts.service';
+import { Public } from 'src/auth/public.decorator';
 
 @Controller('posts')
 export class PostsController {
@@ -14,6 +15,7 @@ export class PostsController {
     }
 
     @Get()
+    @Public()
     async getAllPosts(@Query('page') page: number) {
         if (!page) throw new BadRequestException('Page is required');
         if (page < 1) throw new BadRequestException('Page must be greater than 0');
@@ -48,6 +50,12 @@ export class PostsController {
     @Get(':id')
     async getPostById(@Param('id') id: string) {
         return await this.postsService.getPostById(id);
+    }
+
+    @Get('detail/:id')
+    @Public()
+    async getPostDetailById(@Param('id') id: string) {
+        return await this.postsService.getPostDetailById(id);
     }
 
     @Delete(':id')

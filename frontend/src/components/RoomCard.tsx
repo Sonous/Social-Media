@@ -14,7 +14,7 @@ const RoomCard = ({ room }: { room: Room }) => {
     function showAvatar() {
         if (room.type === 'private') {
             const otherUser = room.roomUsers?.find((roomUser) => roomUser.user_id !== user.id) as RoomUser;
-            return <CustomAvatar avatar_url={otherUser?.user.avatar_url} username={otherUser?.user.username} />;
+            return <CustomAvatar avatar_url={otherUser?.user.avatar_url} username={otherUser?.user.username} className='size-[60px]'/>;
         }
     }
 

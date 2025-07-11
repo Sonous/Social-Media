@@ -157,21 +157,8 @@ const ChatRoom = () => {
     };
 
     return (
-        <div className="p-5 flex flex-col h-full">
-            <section className="border-b-[1px] pb-3 flex items-center gap-3">
-                <motion.div
-                    whileHover={{
-                        x: -5,
-                        transition: { duration: 0.2 },
-                    }}
-                >
-                    <ChevronLeft
-                        className="cursor-pointer"
-                        onClick={() => {
-                            window.history.back();
-                        }}
-                    />
-                </motion.div>
+        <div className="flex flex-col size-full">
+            <section className="border-b-[1px] p-[16px] flex items-center gap-3">
                 <div className="flex gap-3 items-center">
                     {showAvatar()}
                     <div>
@@ -181,8 +168,8 @@ const ChatRoom = () => {
                 </div>
             </section>
 
-            <section ref={divRef} className="flex-1 w-full p-3 mb-3 space-y-4 overflow-auto">
-                <div className="flex-center flex-col gap-3">
+            <section ref={divRef} className="flex-1 p-3 mb-3 space-y-4 overflow-auto">
+                <div className="flex-center flex-col gap-3 p-5">
                     {showAvatar('w-20 h-20')}
                     <h1>{showRoomName()}</h1>
                 </div>
@@ -207,13 +194,13 @@ const ChatRoom = () => {
                 })}
             </section>
 
-            <section className="input border-2 rounded-3xl flex items-center px-3">
+            <section className="input border-2 rounded-3xl flex items-center px-3 mx-5 mb-3">
                 <CustomInput
                     inputValue={messageInput}
                     setInputValue={setMessageInput}
                     symbolTrigger="@"
                     type="input"
-                    className="bg-white rounded-3xl"
+                    className="bg-white"
                 />
                 <div>
                     {messageInput && (

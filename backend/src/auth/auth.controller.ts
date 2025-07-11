@@ -56,4 +56,22 @@ export class AuthController {
             accessToken,
         };
     }
+
+    @Get('me')
+    async authMe(@Req() req: Request) {
+        const refreshToken = req.cookies['refreshToken'];
+
+        return await this.authService.authMe(refreshToken);
+    }
+
+    @Get('logout')
+    async logout(@Res() res: Response) {
+        res.clearCookie('refreshToken', {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'none',
+        });
+
+        return res.status(200).json({ message: 'Logged out successfully' });
+    }
 }

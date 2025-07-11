@@ -9,7 +9,7 @@ import MediumPost from './MediumPost';
 import _ from 'lodash';
 import useTokenStore from '@/store/useTokenStore';
 
-export default function FullPost({ post }: { post: Post }) {
+export default function FullPost({ post, type }: { post: Post; type: 'modal' | 'none' }) {
     const [commentInput, setCommentInput] = useState('');
     const [comments, setComments] = useState<CustomComment[]>([]);
     const [mentions, setMentions] = useState<Mention[]>([]);
@@ -96,8 +96,12 @@ export default function FullPost({ post }: { post: Post }) {
     }, [commentInput]);
 
     return (
-        <div>
-            <MediumPost post={post} className='h-[300px] md:h-[400px] lg:h-[500px]' type='full'>
+        <div className={` flex flex-col h-full ${type === 'none' ? 'w-[600px]' : ''}`}>
+            <MediumPost
+                post={post}
+                className={`${type === 'modal' ? 'h-[300px] md:h-[400px] lg:h-[500px]' : 'flex-1'}`}
+                type="full"
+            >
                 <section className="space-y-5">
                     {comments.map((comment) => (
                         <Comment
@@ -111,13 +115,11 @@ export default function FullPost({ post }: { post: Post }) {
                         />
                     ))}
                 </section>
-                <>
-                    {showPlusButton && (
-                        <div className="p-5 flex-center">
-                            <CirclePlus className="cursor-pointer" onClick={() => setPage((prev) => prev + 1)} />
-                        </div>
-                    )}
-                </>
+                {showPlusButton && (
+                    <div className="p-5 flex-center">
+                        <CirclePlus className="cursor-pointer" onClick={() => setPage((prev) => prev + 1)} />
+                    </div>
+                )}
             </MediumPost>
             <section className="w-full p-3 bg-white flex items-center gap-3">
                 <CustomInput symbolTrigger="@" inputValue={commentInput} setInputValue={setCommentInput} type="input" />

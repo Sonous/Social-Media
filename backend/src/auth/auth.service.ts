@@ -161,4 +161,19 @@ export class AuthService {
         }
         await this.userService.updateUserById(user.id, { password });
     }
+
+    async authMe(refreshToken: string): Promise<boolean> {
+        try {
+            const payload: TokenPayload = await this.jwtService.verifyAsync(refreshToken);
+
+            if (payload.tokenType !== 'refreshToken') {
+                return false;
+            }
+
+            return true;
+        } catch (error) {
+            console.log('Error verifying refresh token:', error);
+            return false;
+        }
+    }
 }

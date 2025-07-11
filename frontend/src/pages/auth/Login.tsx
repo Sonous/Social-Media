@@ -42,19 +42,15 @@ function Login() {
             setToken(accessToken);
             navigate('/');
         } catch (error) {
-            if (error instanceof AxiosError) {
-                if (error.status === 401) {
-                    form.setError('email', {
-                        type: 'manual',
-                        message: 'Invalid email or password',
-                    });
-                    form.setError('password', {
-                        type: 'manual',
-                        message: 'Invalid email or password',
-                    });
-                }
-                console.log(error);
-            }
+            form.setError('email', {
+                type: 'manual',
+                message: 'Invalid email or password',
+            });
+            form.setError('password', {
+                type: 'manual',
+                message: 'Invalid email or password',
+            });
+            console.log(error);
         }
     }
 

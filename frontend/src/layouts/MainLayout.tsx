@@ -13,6 +13,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import axiosInstance from '@/configs/axios.config';
+import rawAxios from '@/configs/rawAxios.config';
 import useTokenStore from '@/store/useTokenStore';
 import { AlignJustify, Bell, Bookmark, House, Search, Send, Settings2, SquarePlus } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
@@ -33,7 +34,7 @@ const initNavItem: NavItem[] = [
     },
     {
         iconElement: <Send />,
-        label: 'Message',
+        label: 'Messages',
         link: '/inbox',
         isActive: false,
     },
@@ -159,9 +160,9 @@ function MainLayout() {
 
     return (
         <div className="relative">
-            <main className="flex h-svh max-sm:flex-col">
-                <div ref={asideRef} className="relative max-sm:order-2 sm:flex">
-                    <div className="lg:w-[250px] sm:flex ">
+            <main className="flex h-screen max-sm:flex-col">
+                <div ref={asideRef} className="max-sm:order-2 sm:flex">
+                    <div className={`sm:flex ${!location.pathname.includes('/inbox') && 'lg:w-[250px]'}`}>
                         <aside className="relative max-sm:border-t-2 sm:border-r-2 bg-white">
                             <div className="px-2 py-2 sm:py-5 flex h-full flex-col max-lg:items-center">
                                 <div className="px-2 py-6 lg:px-3 lg:py-7 flex max-sm:hidden">
@@ -170,7 +171,7 @@ function MainLayout() {
                                     </Link>
                                 </div>
 
-                                <div className="flex-1 flex flex-col gap-3 max-sm:justify-evenly max-sm:w-full max-sm:flex-row overflow-auto">
+                                <div className="flex-1 flex flex-col gap-3 max-sm:justify-between max-sm:items-center max-sm:w-full max-sm:flex-row overflow-auto">
                                     {navItems.map((navItem, index) => (
                                         <div key={index} className="relative">
                                             {navItem.label === 'Notifications' && unReadNotifications !== 0 && (
@@ -187,59 +188,75 @@ function MainLayout() {
                                             />
                                         </div>
                                     ))}
-                                    {user && (
-                                        <NavItem
-                                            iconElement={
-                                                <CustomAvatar avatar_url={user.avatar_url} username={user.username} />
-                                            }
-                                            label={'Profile'}
-                                            isActive={location.pathname.includes(user.username)}
-                                            onClick={() => {
-                                                setMiniPopup('none');
-                                                navigate(`/${user.username}`);
-                                            }}
-                                            miniPopup={miniPopup}
-                                        />
-                                    )}
-                                </div>
-
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger>
-                                        <NavItem iconElement={<AlignJustify />} label="More" miniPopup={miniPopup} />
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent>
-                                        <DropdownMenuItem>
-                                            <Link to="/">
-                                                <Button variant={'ghost'}>
-                                                    <Bookmark />
-                                                    Bookmarks
-                                                </Button>
-                                            </Link>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem>
-                                            <Link to="/accounts/edit">
-                                                <Button variant={'ghost'}>
-                                                    <Settings2 />
-                                                    Settings
-                                                </Button>
-                                            </Link>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuSeparator />
-                                        <DropdownMenuItem>
-                                            <Button
-                                                variant={'ghost'}
+                                    <div className="sm:flex-1">
+                                        {user && (
+                                            <NavItem
+                                                iconElement={
+                                                    <CustomAvatar
+                                                        avatar_url={user.avatar_url}
+                                                        username={user.username}
+                                                    />
+                                                }
+                                                label={'Profile'}
+                                                isActive={location.pathname.includes(user.username)}
                                                 onClick={() => {
-                                                    clearToken();
-                                                    navigate('/login', {
-                                                        replace: true,
-                                                    });
+                                                    setMiniPopup('none');
+                                                    navigate(`/${user.username}`);
                                                 }}
-                                            >
-                                                Logout
-                                            </Button>
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
+                                                miniPopup={miniPopup}
+                                            />
+                                        )}
+                                    </div>
+
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger>
+                                            <NavItem
+                                                iconElement={<AlignJustify />}
+                                                label="More"
+                                                miniPopup={miniPopup}
+                                            />
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent>
+                                            <DropdownMenuItem>
+                                                <Link to="/">
+                                                    <Button variant={'ghost'}>
+                                                        <Bookmark />
+                                                        Bookmarks
+                                                    </Button>
+                                                </Link>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem>
+                                                <Link to="/accounts/edit">
+                                                    <Button variant={'ghost'}>
+                                                        <Settings2 />
+                                                        Settings
+                                                    </Button>
+                                                </Link>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuItem>
+                                                <Button
+                                                    variant={'ghost'}
+                                                    onClick={() => {
+                                                        rawAxios
+                                                            .get('/auth/logout')
+                                                            .then(({ data }) => {
+                                                                console.log('Logout successful:', data);
+                                                                clearToken();
+                                                                navigate('/login', {
+                                                                    replace: true,
+                                                                });
+                                                            })
+                                                            .catch((err) => console.error('Logout error:', err));
+                                                    }}
+                                                    className='w-full'
+                                                >
+                                                    Logout
+                                                </Button>
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </div>
                             </div>
 
                             <div
@@ -262,10 +279,7 @@ function MainLayout() {
                     </div>
                 </div>
 
-                <div className="overflow-y-auto max-sm:flex-1 order-1 w-full">
-                    <Outlet />
-                </div>
-
+                <Outlet />
                 {showCreateDialog && <CreateDialog setShowCreateDialog={setShowCreateDialog} />}
             </main>
         </div>

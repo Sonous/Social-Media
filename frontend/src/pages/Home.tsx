@@ -31,16 +31,20 @@ function Home() {
     }
 
     return (
-        <div className="flex-center flex-col gap-5">
-            {posts.map((post, index) => (
-                <MediumPost key={index} post={post} className="max-w-[400px] md:max-w-[600px] lg:max-w-[700px]" />
-            ))}
-
-            {showPlusButton && (
-                <div className="p-5">
-                    <CirclePlus className="cursor-pointer" onClick={fetchPosts} />
-                </div>
-            )}
+        <div className="overflow-auto flex-1 flex flex-col items-center gap-5 w-full">
+            <div>
+                {posts.map((post, index) => (
+                    <MediumPost key={index} post={post} 
+                    className="max-w-[400px] md:max-w-[600px] lg:max-w-[700px]" 
+                    />
+                ))}
+    
+                {showPlusButton && (
+                    <div className="p-5">
+                        <CirclePlus className="cursor-pointer" onClick={fetchPosts} />
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

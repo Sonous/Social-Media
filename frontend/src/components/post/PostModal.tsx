@@ -17,7 +17,7 @@ export default function PostModal({
                 <DialogHeader>
                     <DialogTitle className="flex items-center justify-center">Post</DialogTitle>
                 </DialogHeader>
-                <FullPost post={post} />
+                <FullPost post={post} type='modal' />
             </DialogContent>
         </Dialog>
     );

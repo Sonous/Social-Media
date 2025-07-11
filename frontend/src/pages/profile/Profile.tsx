@@ -119,7 +119,7 @@ export const Profile = () => {
     // console.log(profile);
 
     return (
-        <div className="py-10 sm:profile-width sm:p-5 m-auto pt-10">
+        <div className="size-full py-10 sm:profile-width sm:p-5 m-auto pt-10">
             {!profiltState && !profile ? (
                 <Loading />
             ) : (

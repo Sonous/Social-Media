@@ -143,114 +143,114 @@ export default function MediumPost({
     return (
         <>
             {postOwner && (
-                <div className={`w-full h-full flex flex-col bg-white ${className}`}>
-                    <div className="flex-1 w-full h-full overflow-y-auto p-3 space-y-3">
-                        <div className="flex justify-between items-center">
-                            <div className="flex gap-3 items-center">
-                                <CustomAvatar
-                                    className="cursor-pointer"
-                                    avatar_url={postOwner.avatar_url}
-                                    username={postOwner.username}
+                <div className={`bg-white overflow-y-auto p-3 space-y-3 ${className}`}>
+                    <div className="flex justify-between items-center">
+                        <div className="flex gap-3 items-center">
+                            <CustomAvatar
+                                className="cursor-pointer"
+                                avatar_url={postOwner.avatar_url}
+                                username={postOwner.username}
+                                onClick={() => navigate(`/${postOwner.username}`)}
+                            />
+                            <div className="">
+                                <h1
+                                    className="font-medium cursor-pointer"
                                     onClick={() => navigate(`/${postOwner.username}`)}
-                                />
-                                <div className="">
-                                    <h1
-                                        className="font-medium cursor-pointer"
-                                        onClick={() => navigate(`/${postOwner.username}`)}
-                                    >
-                                        {postOwner?.username}
-                                    </h1>
-                                    <p className="text-sm">{formatDate(post.created_at)}</p>
-                                </div>
-                            </div>
-                            <div>
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger>
-                                        <Ellipsis size={20} color="#000000" />
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent>
-                                        <DropdownMenuItem
-                                            onClick={() => {
-                                                navigate(`/${postOwner.username}`);
-                                            }}
-                                        >
-                                            About this account
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem>Go to post</DropdownMenuItem>
-                                        {post.user_id === user.id && (
-                                            <DropdownMenuItem
-                                                onClick={async () => {
-                                                    try {
-                                                        await postApis.deletePost(post.id);
-
-                                                        toast({
-                                                            title: 'Delete post successfully',
-                                                        });
-                                                    } catch (error) {
-                                                        console.log('Delete post error:', error);
-                                                    }
-                                                }}
-                                            >
-                                                Delete post
-                                            </DropdownMenuItem>
-                                        )}
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
+                                >
+                                    {postOwner?.username}
+                                </h1>
+                                <p className="text-sm">{formatDate(post.created_at)}</p>
                             </div>
                         </div>
-
-                        <section>
-                            <CustomInput symbolTrigger="#" inputValue={post.content} type="text" />
-                        </section>
-                        <MediasCarousel medias={post?.medias || []} className="rounded-lg h-full w-full" />
-
-                        <section className="flex justify-between py-3 border-b-2">
-                            <div className="flex gap-3">
-                                <div className="flex items-center gap-1">
-                                    <Heart
-                                        fill={isLike ? 'red' : 'white'}
-                                        className="cursor-pointer"
+                        <div>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger>
+                                    <Ellipsis size={20} color="#000000" />
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                    <DropdownMenuItem
                                         onClick={() => {
-                                            if (isLike) {
-                                                setCurrentWorkPost((prev) => ({
-                                                    ...prev,
-                                                    likeAmount: prev.likeAmount - 1,
-                                                }));
-                                            } else {
-                                                setCurrentWorkPost((prev) => ({
-                                                    ...prev,
-                                                    likeAmount: prev.likeAmount + 1,
-                                                }));
-                                            }
-                                            setIsLike(!isLike);
+                                            navigate(`/${postOwner.username}`);
                                         }}
-                                    />
-                                    <p>{currentWorkPost.likeAmount}</p>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                    <MessageCircle
-                                        className="cursor-pointer"
-                                        onClick={() => {
-                                            if (type === 'none') {
-                                                setIsOpenPostModal(true);
-                                            }
-                                        }}
-                                    />
-                                    <p>{currentWorkPost.commentAmount}</p>
-                                    <PostModal post={post} isOpen={isOpenPostModal} setIsOpen={setIsOpenPostModal} />
-                                </div>
-                            </div>
-                            <Bookmark
-                                fill={isMark ? 'black' : 'white'}
-                                className="cursor-pointer"
-                                onClick={() => {
-                                    setIsMark(!isMark);
-                                }}
-                            />
-                        </section>
+                                    >
+                                        About this account
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => navigate(`/p/${post.id}`)}>
+                                        Go to post
+                                    </DropdownMenuItem>
+                                    {post.user_id === user.id && (
+                                        <DropdownMenuItem
+                                            onClick={async () => {
+                                                try {
+                                                    await postApis.deletePost(post.id);
 
-                        {children}
+                                                    toast({
+                                                        title: 'Delete post successfully',
+                                                    });
+                                                } catch (error) {
+                                                    console.log('Delete post error:', error);
+                                                }
+                                            }}
+                                        >
+                                            Delete post
+                                        </DropdownMenuItem>
+                                    )}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
                     </div>
+
+                    <section>
+                        <CustomInput symbolTrigger="#" inputValue={post.content} type="text" />
+                    </section>
+                    <MediasCarousel medias={post?.medias || []} className="rounded-lg h-full w-full" />
+
+                    <section className="flex justify-between py-3 border-b-2">
+                        <div className="flex gap-3">
+                            <div className="flex items-center gap-1">
+                                <Heart
+                                    fill={isLike ? 'red' : 'white'}
+                                    className="cursor-pointer"
+                                    onClick={() => {
+                                        if (isLike) {
+                                            setCurrentWorkPost((prev) => ({
+                                                ...prev,
+                                                likeAmount: prev.likeAmount - 1,
+                                            }));
+                                        } else {
+                                            setCurrentWorkPost((prev) => ({
+                                                ...prev,
+                                                likeAmount: prev.likeAmount + 1,
+                                            }));
+                                        }
+                                        setIsLike(!isLike);
+                                    }}
+                                />
+                                <p>{currentWorkPost.likeAmount}</p>
+                            </div>
+                            <div className="flex items-center gap-1">
+                                <MessageCircle
+                                    className="cursor-pointer"
+                                    onClick={() => {
+                                        if (type === 'none') {
+                                            setIsOpenPostModal(true);
+                                        }
+                                    }}
+                                />
+                                <p>{currentWorkPost.commentAmount}</p>
+                                <PostModal post={post} isOpen={isOpenPostModal} setIsOpen={setIsOpenPostModal} />
+                            </div>
+                        </div>
+                        <Bookmark
+                            fill={isMark ? 'black' : 'white'}
+                            className="cursor-pointer"
+                            onClick={() => {
+                                setIsMark(!isMark);
+                            }}
+                        />
+                    </section>
+
+                    {children}
                 </div>
             )}
         </>

@@ -2,22 +2,40 @@
 
 Một ứng dụng mạng xã hội mini lấy cảm hứng giao diện từ Instagram cho phép người dùng đăng bài viết, tương tác với bài viết bằng like, comment, tìm kiếm người dùng, follow người dùng khác, và quản lý thông tin cá nhân, nhắn tin giữa các người dùng.
 
+Sử dụng test account này để truy cập website:
+- Email: lmquchuy2004@gmail.com
+- Password: Huy@12345
+
 ---
 
 ## 🚀 Demo
 
-- 🌐 Frontend: [https://your-frontend.vercel.app](https://your-frontend.vercel.app)
-- 🔗 Backend: [https://your-backend.render.com](https://your-backend.render.com)
-- 📂 Source Code Frontend: [Link GitHub FE](https://github.com/yourname/your-fe-repo)
-- 📂 Source Code Backend: [Link GitHub BE](https://github.com/yourname/your-be-repo)
-- 📺 Video demo: [Link Youtube Demo](https://github.com/yourname/your-be-repo)
+- 🌐 Website: [Link website](https://your-frontend.vercel.app)
+- 📺 Video demo: [Link Youtube Demo](https://youtu.be/SJAbyXskhZE)
 
 ---
 
-## 📸 Screenshot
+## 📸 Screenshot Demo
 
-> (Thêm ảnh giao diện tại đây — sử dụng ![alt](link hình ảnh) nếu muốn)
+**Trang chủ:**
 
+![Giao diện trang chủ](./demo/Home-Page.png)
+
+**Trang tin nhắn:**
+
+![Giao diện trang tin nhắn](./demo/Message-Page.png)
+
+**Trang cá nhân:**
+
+![Giao diện trang cá nhân](./demo/Profile-Page.png)
+
+**Dialog tạo bài viết:**
+
+![Giao diện Dialog tạo bài viết](./demo/Create-a-post.png)
+
+**Xem full bài viết:**
+
+![Giao diện Xem full bài viết](./demo/View-full-post.png)
 ---
 
 ## ⚙️ Tính năng chính
@@ -27,33 +45,35 @@ Một ứng dụng mạng xã hội mini lấy cảm hứng giao diện từ Ins
 - ✅ Tạo / sửa / xoá bài viết
 - ✅ Like, bình luận, thêm vào bài viết vào mục yêu thích
 - ✅ Quản lý hồ sơ người dùng
-- ✅ Nhắn tin giữa các người dùng thông qua WebSocket/Socket.IO
+- ✅ Nhắn tin có xác thực giữa các người dùng thông qua WebSocket/Socket.IO
 - ✅ Follow người dùng
 - ✅ Tìm kiếm người dùng
+- ✅ Thông báo realtime
 - ✅ Responsive UI
-- ✅ API chuẩn RESTful
 
 ---
 
 ## 🛠️ Công nghệ sử dụng
-
-### Frontend:
+**Frontend**:
 - Vite
 - ReactJS
-- TailwindCSS / Shadcn/ui
-- Zustand 
+- TailwindCSS
+- Shadcn/ui
+- Zustand
 - Axios
+- Cloudinary
 
-### Backend:
+**Backend**:
 - NestJS (Node.js)
 - PostgreSQL
 - TypeORM
 - JWT Authentication
-- WebSocket/Socket.IO
+- WebSocket (Socket.IO)
 
-### Khác:
-- Render (Backend Deploy)
-- Vercel (Frontend Deploy)
+**Khác**:
+- Render (Deploy Backend)
+- Vercel (Deploy Frontend)
+- Neon (Database Hosting)
 - Postman (API Testing)
 
 ---
@@ -107,6 +127,8 @@ COOKIE_SECRET=
 
 #CORS URL
 ORIGIN_CORS=
+
+CLOUDINARY_API_SECRET=
 ```
 
 ### 📁 Frontend (`/frontend/.env`)

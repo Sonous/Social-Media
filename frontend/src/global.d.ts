@@ -137,7 +137,7 @@ type TokenPayload = {
     exp: number;
 };
 
-type MiniPopupState = 'search' | 'notification' | 'none';
+type MiniPopupState = 'search' | 'notification' | 'inbox' | 'none';
 
 type Pageable<T> = {
     data: T[];

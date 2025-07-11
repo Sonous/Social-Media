@@ -13,6 +13,10 @@ const postApis = {
         });
     },
 
+    getPostDetailById(id: string) {
+        return axiosInstance.get(`/posts/detail/${id}`);
+    },
+
     getAllPosts(page: number) {
         return axiosInstance.get(`/posts`, {
             params: {

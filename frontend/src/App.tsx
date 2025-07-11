@@ -1,16 +1,17 @@
 import { BrowserRouter, Route, Routes } from 'react-router';
-import Home from './pages/Home';
+import AccountLayout from './layouts/AccountLayout';
 import MainLayout from './layouts/MainLayout';
 import Login from './pages/auth/Login';
-import Signup from './pages/auth/Signup';
 import Reset from './pages/auth/Reset';
-import { Inbox } from './pages/inbox/Inbox';
-import { Profile } from './pages/profile/Profile';
-import Posts from './pages/profile/Posts';
-import Saved from './pages/profile/Saved';
+import Signup from './pages/auth/Signup';
+import Home from './pages/Home';
 import ChatRoom from './pages/inbox/ChatRoom';
+import { Inbox } from './pages/inbox/Inbox';
 import NotFound from './pages/NotFound';
-import AccountLayout from './layouts/AccountLayout';
+import PostDetail from './pages/PostDetail';
+import Posts from './pages/profile/Posts';
+import { Profile } from './pages/profile/Profile';
+import Saved from './pages/profile/Saved';
 import EditProfile from './pages/setting/EditProfile';
 import { UnauthorProtectRoutes } from './utils/UnauthorProtectRoute';
 
@@ -20,8 +21,7 @@ function App() {
             <Routes>
                 <Route element={<MainLayout />}>
                     <Route index element={<Home />} />
-                    <Route path="/inbox">
-                        <Route index element={<Inbox />} />
+                    <Route path="/inbox" element={<Inbox />}>
                         <Route path=":roomId" element={<ChatRoom />} />
                     </Route>
                     <Route path="/:username" element={<Profile />}>
@@ -33,6 +33,8 @@ function App() {
                         <Route path="edit" element={<EditProfile />} />
                     </Route>
                     <Route path="/not-found" element={<NotFound />} />
+
+                    <Route path="/p/:postId" element={<PostDetail />} />
                     <Route path="*" element={<NotFound />} />
                 </Route>
 

@@ -51,7 +51,7 @@ const Message = ({
             }}
         >
             {message.user_id !== user.id && (
-                <CustomAvatar avatar_url={message.sender.avatar_url} username={message.sender.username} />
+                <CustomAvatar avatar_url={message.sender.avatar_url} username={message.sender.username} className='size-[25px]'/>
             )}
 
             <div className={`${message.user_id === user.id ? 'order-2' : 'order-1'}`}>
