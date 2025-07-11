@@ -6,14 +6,10 @@ Sử dụng test account này để truy cập website:
 - Email: lmquchuy2004@gmail.com
 - Password: Huy@12345
 
----
-
 ## 🚀 Demo
 
 - 🌐 Website: [Link website](https://your-frontend.vercel.app)
 - 📺 Video demo: [Link Youtube Demo](https://youtu.be/SJAbyXskhZE)
-
----
 
 ## 📸 Screenshot Demo
 
@@ -35,8 +31,7 @@ Sử dụng test account này để truy cập website:
 
 **Xem full bài viết:**
 
-![Giao diện Xem full bài viết](./demo/View-full-post.png)
----
+![Giao diện Xem full bài viết](./demo/View-full-post.png
 
 ## ⚙️ Tính năng chính
 
@@ -50,8 +45,6 @@ Sử dụng test account này để truy cập website:
 - ✅ Tìm kiếm người dùng
 - ✅ Thông báo realtime
 - ✅ Responsive UI
-
----
 
 ## 🛠️ Công nghệ sử dụng
 **Frontend**:
@@ -75,17 +68,6 @@ Sử dụng test account này để truy cập website:
 - Vercel (Deploy Frontend)
 - Neon (Database Hosting)
 - Postman (API Testing)
-
----
-<!-- 
-## 🔐 Phân quyền người dùng
-
-| Role   | Quyền hạn |
-|--------|-----------|
-| User   | Đăng bài, sửa bài của mình, like/comment |
-| Admin  | Toàn quyền quản lý bài viết, user |
-
---- -->
 
 ## 📦 Cài đặt local
 

@@ -1,14 +1,13 @@
-import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import authApis from '@/apis/auth.api';
+import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Link, useNavigate } from 'react-router';
-import authApis from '@/apis/auth.api';
-import { AxiosError } from 'axios';
 import useTokenStore from '@/store/useTokenStore';
+import { Link, useNavigate } from 'react-router';
 // import google from '@/assets/googleLogo.png';
 // import github from '@/assets/githubLogo.svg';
 

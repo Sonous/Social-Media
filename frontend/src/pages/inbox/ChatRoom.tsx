@@ -6,8 +6,6 @@ import axiosInstance from '@/configs/axios.config';
 import useTokenStore from '@/store/useTokenStore';
 import { formatDate } from '@/utils/formatDate';
 import { uniqueArr } from '@/utils/uniqueArr';
-import { ChevronLeft } from 'lucide-react';
-import { motion } from 'motion/react';
 import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router';
 import { io, Socket } from 'socket.io-client';
