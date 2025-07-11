@@ -31,7 +31,7 @@ Sử dụng test account này để truy cập website:
 
 **Xem full bài viết:**
 
-![Giao diện Xem full bài viết](./demo/View-full-post.png
+![Giao diện Xem full bài viết](./demo/View-full-post.png)
 
 ## ⚙️ Tính năng chính
 
